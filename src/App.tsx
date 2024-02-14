@@ -1,28 +1,45 @@
-import React, { Suspense, lazy } from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { Suspense, lazy, useMemo } from "react";
+import { Routes, Route, Link } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import {
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
+  DiscordOutlined,
+  GroupOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
+import { menus } from "./constants";
 
 const { Sider } = Layout;
 
-const items = [
-  UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-  UserOutlined,
-].map((icon, index) => ({
-  key: String(index + 1),
-  icon: React.createElement(icon),
-  label: `nav ${index + 1}`,
-}));
-
 const ProviderPage = lazy(() => import("./pages/Provider/providerPage"));
+const ServerPage = lazy(() => import("./pages/Provider/serverPage"));
+
+const onGetIcons = (name: string): React.ReactNode => {
+  switch (name) {
+    case "providers":
+      return <DiscordOutlined />;
+    case "servers":
+      return <GroupOutlined />;
+    case "channels":
+      return <TeamOutlined />;
+  }
+};
 
 const App: React.FC = () => {
+  const renderMenus = useMemo(() => {
+    const menuItems = menus.map((menu) => {
+      return (
+        <Menu.Item key={menu.key}>
+          <Link to={menu.url}>
+            {menu.icon ? onGetIcons(menu.icon) : undefined}
+            <span>{menu.name}</span>
+          </Link>
+        </Menu.Item>
+      );
+    });
+
+    return menuItems;
+  }, []);
+
   return (
     <Layout className="h-100-per">
       <Sider
@@ -37,12 +54,15 @@ const App: React.FC = () => {
         }}
         theme="light"
       >
-        <div className="demo-logo-vertical" />
-        <Menu mode="inline" defaultSelectedKeys={["4"]} items={items} />
+        <div className="logo-container">
+          <span className="logo-text">Token Info</span>
+        </div>
+        <Menu mode="inline">{renderMenus}</Menu>
       </Sider>
       <Suspense fallback={<div />}>
         <Routes>
           <Route path="/providers" element={<ProviderPage />} />
+          <Route path="/servers" element={<ServerPage />} />
         </Routes>
       </Suspense>
     </Layout>

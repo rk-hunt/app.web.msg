@@ -26,3 +26,13 @@ body {
 .ant-table-cell {
   background: #ffffff !important;
 }
+
+.logo-container {
+  padding: 24px;
+}
+
+.logo-text {
+  font-size: 30px;
+  font-weight: 600;
+  /* color: #1677FF; */
+}

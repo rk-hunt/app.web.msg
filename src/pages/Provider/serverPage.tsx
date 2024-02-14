@@ -15,27 +15,35 @@ import {
 } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Header, Page } from "../../components";
-import { Provider } from "../../types";
+import { ProviderServer } from "../../types";
 import { datetimeFormat } from "../../constants";
 
 const { Content } = Layout;
 
-const providers: Provider[] = [
+const providerServers: ProviderServer[] = [
   {
     _id: "65cb7500ad9feb48dba1e686",
-    name: "Discord",
+    provider_id: "65cb7500ad9feb48dba1e686",
+    provider_name: "Discord",
+    server_id: "65cb7500ad9feb48dba1e687",
+    server_name: "Heisenberg",
+    type: "Channel",
     created_at: 1707832576683,
     updated_at: 0,
   },
   {
     _id: "65cb8a7ae89f207e6d3ed3c1",
-    name: "Telegram",
-    created_at: 1707838074895,
+    provider_id: "65cb8a7ae89f207e6d3ed3c1",
+    provider_name: "Telegram",
+    server_id: "65cb7500ad9feb48dba1e687",
+    server_name: "Professor",
+    type: "Group",
+    created_at: Date.now(),
     updated_at: 0,
   },
 ];
 
-const ProviderPage: React.FC = () => {
+const ServerPage: React.FC = () => {
   const [visibleModal, setVisibleModal] = useState(false);
   const [form] = Form.useForm<any>();
 
@@ -47,7 +55,15 @@ const ProviderPage: React.FC = () => {
     const columns: TableColumnsType<any> = [
       {
         title: "Name",
-        dataIndex: "name",
+        dataIndex: "server_name",
+      },
+      {
+        title: "Type",
+        dataIndex: "type",
+      },
+      {
+        title: "Provider",
+        dataIndex: "provider_name",
       },
       {
         title: "Created At",
@@ -77,28 +93,29 @@ const ProviderPage: React.FC = () => {
 
   return (
     <Content>
-      <Header title="Providers" />
-      <Page title="Providers">
+      <Header title="Servers" />
+      <Page title="Servers">
         <Row>
           <Col span={24} style={{ marginBottom: 24 }}>
-            <Flex justify="flex-end">
+            <Flex justify="space-between">
+              <Button>Filter</Button>
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={onOpenModal}
               >
-                New Provider
+                New Server
               </Button>
             </Flex>
           </Col>
           <Col span={24}>
-            <Table columns={tableColumns} dataSource={providers} />
+            <Table columns={tableColumns} dataSource={providerServers} />
           </Col>
         </Row>
       </Page>
 
       <Modal
-        title="New Provider"
+        title="New Server"
         width={450}
         centered
         closable={false}
@@ -125,4 +142,4 @@ const ProviderPage: React.FC = () => {
   );
 };
 
-export default memo(observer(ProviderPage));
+export default memo(observer(ServerPage));
