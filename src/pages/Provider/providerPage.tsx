@@ -14,28 +14,16 @@ import {
   TableColumnsType,
 } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import useStores from "../../stores";
 import { Header, Page } from "../../components";
-import { Provider } from "../../types";
 import { datetimeFormat } from "../../constants";
 
 const { Content } = Layout;
 
-const providers: Provider[] = [
-  {
-    _id: "65cb7500ad9feb48dba1e686",
-    name: "Discord",
-    created_at: 1707832576683,
-    updated_at: 0,
-  },
-  {
-    _id: "65cb8a7ae89f207e6d3ed3c1",
-    name: "Telegram",
-    created_at: 1707838074895,
-    updated_at: 0,
-  },
-];
-
 const ProviderPage: React.FC = () => {
+  const { providerStore } = useStores();
+  const { data, isFetching } = providerStore;
+
   const [visibleModal, setVisibleModal] = useState(false);
   const [form] = Form.useForm<any>();
 
@@ -92,7 +80,11 @@ const ProviderPage: React.FC = () => {
             </Flex>
           </Col>
           <Col span={24}>
-            <Table columns={tableColumns} dataSource={providers} />
+            <Table
+              columns={tableColumns}
+              dataSource={data}
+              loading={isFetching}
+            />
           </Col>
         </Row>
       </Page>

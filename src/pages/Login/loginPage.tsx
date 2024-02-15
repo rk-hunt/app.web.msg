@@ -1,12 +1,12 @@
 import React, { memo } from "react";
 import { observer } from "mobx-react-lite";
-import { Button, Card, Flex, Form, Input, Typography } from "antd";
-import "./index.css";
+import { Button, Card, Flex, Form, Input } from "antd";
 import { SendOutlined } from "@ant-design/icons";
-
-const { Title } = Typography;
+import "./index.css";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm<any>();
 
   const onRequestOTP = () => {
@@ -17,9 +17,9 @@ const LoginPage: React.FC = () => {
     <div className="login-container">
       <Flex justify="center" align="center" style={{ width: "100%" }}>
         <Card className="login-card">
-          <div>
+          <div style={{ paddingTop: 16 }}>
             <Flex justify="center">
-              <Title level={2}>Token Info</Title>
+              <span className="logo-text">Token Info</span>
             </Flex>
           </div>
           <div className="login-form">
@@ -59,6 +59,7 @@ const LoginPage: React.FC = () => {
                 size="large"
                 block
                 style={{ marginTop: 16 }}
+                onClick={() => navigate("/servers")}
               >
                 Login
               </Button>

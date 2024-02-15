@@ -8,15 +8,21 @@ import {
   Form,
   Input,
   Layout,
-  Modal,
+  Popover,
   Row,
+  Select,
   Table,
   TableColumnsType,
 } from "antd";
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  FilterOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { Header, Page } from "../../components";
 import { ProviderServer } from "../../types";
 import { datetimeFormat } from "../../constants";
+import SetupModal from "../Partial/SetupModal";
 
 const { Content } = Layout;
 
@@ -50,6 +56,10 @@ const ServerPage: React.FC = () => {
   const onOpenModal = useCallback(() => {
     setVisibleModal(!visibleModal);
   }, [visibleModal]);
+
+  const onSave = useCallback((values: any) => {
+    console.log("values: ", values);
+  }, []);
 
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
@@ -91,6 +101,42 @@ const ServerPage: React.FC = () => {
     return columns;
   }, []);
 
+  const filterForm = useMemo(() => {
+    return (
+      <Form
+        layout="vertical"
+        form={form}
+        name="filter_form"
+        style={{ padding: 8, width: 300 }}
+      >
+        <Form.Item label="Name" name="name">
+          <Input placeholder="Heisenberg" />
+        </Form.Item>
+        <Form.Item label="Type" name="type">
+          <Select
+            placeholder="Channel"
+            options={[
+              { value: "Channel", label: "Channel" },
+              { value: "Group", label: "Group" },
+            ]}
+          />
+        </Form.Item>
+        <Form.Item label="Provider" name="provider">
+          <Select
+            placeholder="Discord"
+            options={[
+              { value: "Discord", label: "Discord" },
+              { value: "Telegram", label: "Telegram" },
+            ]}
+          />
+        </Form.Item>
+        <Button type="primary" block>
+          Apply
+        </Button>
+      </Form>
+    );
+  }, [form]);
+
   return (
     <Content>
       <Header title="Servers" />
@@ -98,7 +144,14 @@ const ServerPage: React.FC = () => {
         <Row>
           <Col span={24} style={{ marginBottom: 24 }}>
             <Flex justify="space-between">
-              <Button>Filter</Button>
+              <Popover
+                content={filterForm}
+                trigger="click"
+                placement="bottomLeft"
+                arrow={false}
+              >
+                <Button icon={<FilterOutlined />}>Filter</Button>
+              </Popover>
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -114,30 +167,20 @@ const ServerPage: React.FC = () => {
         </Row>
       </Page>
 
-      <Modal
+      <SetupModal
         title="New Server"
-        width={450}
-        centered
-        closable={false}
-        open={visibleModal}
+        visible={visibleModal}
         onCancel={onOpenModal}
-        okText="Save"
+        onSave={onSave}
       >
-        <Form
-          layout="vertical"
-          form={form}
-          name="provider_form"
-          style={{ paddingTop: 24, paddingBottom: 24 }}
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: "" }]}
         >
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "" }]}
-          >
-            <Input placeholder="Discord" type="email" />
-          </Form.Item>
-        </Form>
-      </Modal>
+          <Input placeholder="Discord" type="email" />
+        </Form.Item>
+      </SetupModal>
     </Content>
   );
 };

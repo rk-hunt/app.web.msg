@@ -3,16 +3,20 @@ import { Routes, Route, Link } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import {
   DiscordOutlined,
+  FileDoneOutlined,
   GroupOutlined,
+  MessageOutlined,
+  PercentageOutlined,
   TeamOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import { AuthRoute } from "./routes";
 import { menus } from "./constants";
-
-const { Sider } = Layout;
 
 const ProviderPage = lazy(() => import("./pages/Provider/providerPage"));
 const ServerPage = lazy(() => import("./pages/Provider/serverPage"));
 
+const { Sider } = Layout;
 const onGetIcons = (name: string): React.ReactNode => {
   switch (name) {
     case "providers":
@@ -21,6 +25,14 @@ const onGetIcons = (name: string): React.ReactNode => {
       return <GroupOutlined />;
     case "channels":
       return <TeamOutlined />;
+    case "blacklists":
+      return <FileDoneOutlined />;
+    case "weights":
+      return <PercentageOutlined />;
+    case "messages":
+      return <MessageOutlined />;
+    case "users":
+      return <UserOutlined />;
   }
 };
 
@@ -42,18 +54,7 @@ const App: React.FC = () => {
 
   return (
     <Layout className="h-100-per">
-      <Sider
-        width={225}
-        breakpoint="lg"
-        collapsedWidth="0"
-        onBreakpoint={(broken) => {
-          console.log(broken);
-        }}
-        onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
-        }}
-        theme="light"
-      >
+      <Sider width={225} theme="light">
         <div className="logo-container">
           <span className="logo-text">Token Info</span>
         </div>
@@ -61,8 +62,22 @@ const App: React.FC = () => {
       </Sider>
       <Suspense fallback={<div />}>
         <Routes>
-          <Route path="/providers" element={<ProviderPage />} />
-          <Route path="/servers" element={<ServerPage />} />
+          <Route
+            path="/providers"
+            element={
+              <AuthRoute>
+                <ProviderPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/servers"
+            element={
+              <AuthRoute>
+                <ServerPage />
+              </AuthRoute>
+            }
+          />
         </Routes>
       </Suspense>
     </Layout>
