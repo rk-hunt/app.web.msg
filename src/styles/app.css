@@ -1,0 +1,38 @@
+html,
+body {
+    font-weight: 400;
+    overflow: hidden;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    width: 100% !important;
+}
+
+#root {
+    height: 100%;
+    width: 100%;
+}
+
+.h-100-per {
+  height: 100%;
+}
+
+.title {
+  font-size: 18px;
+}
+
+.ant-table-cell {
+  background: #ffffff !important;
+}
+
+.logo-container {
+  padding: 24px;
+}
+
+.logo-text {
+  font-size: 30px;
+  font-weight: 600;
+  /* color: #1677FF; */
+}

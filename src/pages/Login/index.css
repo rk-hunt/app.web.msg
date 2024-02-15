@@ -1,0 +1,15 @@
+.login-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+
+.login-card {
+    width: 450px;
+    height: 450px;
+}
+
+.login-form {
+    margin-top: 16px;
+    padding: 24px;
+}
