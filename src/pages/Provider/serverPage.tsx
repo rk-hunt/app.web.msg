@@ -20,34 +20,9 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { Header, Page } from "../../components";
-import { ProviderServer } from "../../types";
 import { datetimeFormat } from "../../constants";
-import SetupModal from "../Partial/SetupModal";
 
 const { Content } = Layout;
-
-const providerServers: ProviderServer[] = [
-  {
-    _id: "65cb7500ad9feb48dba1e686",
-    provider_id: "65cb7500ad9feb48dba1e686",
-    provider_name: "Discord",
-    server_id: "65cb7500ad9feb48dba1e687",
-    server_name: "Heisenberg",
-    type: "Channel",
-    created_at: 1707832576683,
-    updated_at: 0,
-  },
-  {
-    _id: "65cb8a7ae89f207e6d3ed3c1",
-    provider_id: "65cb8a7ae89f207e6d3ed3c1",
-    provider_name: "Telegram",
-    server_id: "65cb7500ad9feb48dba1e687",
-    server_name: "Professor",
-    type: "Group",
-    created_at: Date.now(),
-    updated_at: 0,
-  },
-];
 
 const ServerPage: React.FC = () => {
   const [visibleModal, setVisibleModal] = useState(false);
@@ -56,10 +31,6 @@ const ServerPage: React.FC = () => {
   const onOpenModal = useCallback(() => {
     setVisibleModal(!visibleModal);
   }, [visibleModal]);
-
-  const onSave = useCallback((values: any) => {
-    console.log("values: ", values);
-  }, []);
 
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
@@ -162,25 +133,10 @@ const ServerPage: React.FC = () => {
             </Flex>
           </Col>
           <Col span={24}>
-            <Table columns={tableColumns} dataSource={providerServers} />
+            <Table columns={tableColumns} dataSource={[]} />
           </Col>
         </Row>
       </Page>
-
-      <SetupModal
-        title="New Server"
-        visible={visibleModal}
-        onCancel={onOpenModal}
-        onSave={onSave}
-      >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[{ required: true, message: "" }]}
-        >
-          <Input placeholder="Discord" type="email" />
-        </Form.Item>
-      </SetupModal>
     </Content>
   );
 };

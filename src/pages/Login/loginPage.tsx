@@ -1,17 +1,31 @@
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { observer } from "mobx-react-lite";
 import { Button, Card, Flex, Form, Input } from "antd";
 import { SendOutlined } from "@ant-design/icons";
-import "./index.css";
 import { useNavigate } from "react-router-dom";
+import useStores from "../../stores";
 
 const LoginPage: React.FC = () => {
+  const { authStore } = useStores();
+
   const navigate = useNavigate();
   const [form] = Form.useForm<any>();
 
-  const onRequestOTP = () => {
-    console.log("sending...");
-  };
+  const onRequestOTP = useCallback(() => {
+    const email = form.getFieldValue("email");
+    if (email !== undefined && email !== "") {
+      authStore.onRequestOTP(email);
+    }
+  }, [authStore, form]);
+
+  const onVerifyOTP = useCallback(() => {
+    const otp = form.getFieldValue("otp");
+    if (otp !== undefined && otp !== "") {
+      authStore.onVerifyOTP(otp, () => {
+        navigate("/providers");
+      });
+    }
+  }, [authStore, form, navigate]);
 
   return (
     <div className="login-container">
@@ -29,22 +43,14 @@ const LoginPage: React.FC = () => {
               name="login_form"
               initialValues={{}}
             >
-              <Form.Item
-                label="Email"
-                name="username"
-                rules={[{ required: true, message: "" }]}
-              >
+              <Form.Item label="Email" name="email">
                 <Input
                   size="large"
                   placeholder="email@token.info"
                   type="email"
                 />
               </Form.Item>
-              <Form.Item
-                label="OTP"
-                name="username"
-                rules={[{ required: true, message: "" }]}
-              >
+              <Form.Item label="OTP" name="otp">
                 <Input
                   size="large"
                   placeholder="010101"
@@ -59,7 +65,7 @@ const LoginPage: React.FC = () => {
                 size="large"
                 block
                 style={{ marginTop: 16 }}
-                onClick={() => navigate("/servers")}
+                onClick={onVerifyOTP}
               >
                 Login
               </Button>

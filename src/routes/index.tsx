@@ -7,6 +7,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import axios from "axios";
+import { Spin } from "antd";
+import { Loading3QuartersOutlined } from "@ant-design/icons";
+
+Spin.setDefaultIndicator(
+  <Loading3QuartersOutlined style={{ fontSize: 24 }} spin />
+);
 
 const LoginPage = lazy(() => import("../pages/Login/loginPage"));
 const App = lazy(() => import("../App"));

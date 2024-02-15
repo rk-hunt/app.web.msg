@@ -4,27 +4,33 @@ import React, { memo, useCallback } from "react";
 type SetupModalProps = {
   title: string;
   visible: boolean;
+  isSaving: boolean;
   onCancel: () => void;
-  onSave: (values: any) => void;
+  onSave: (values: any, callback: () => void) => void;
 };
 
 const SetupModal: React.FC<React.PropsWithChildren<SetupModalProps>> = ({
   title,
   visible,
+  isSaving,
   onCancel,
   onSave,
   children,
 }) => {
   const [form] = Form.useForm<any>();
 
+  const onReset = useCallback(() => {
+    form.resetFields();
+  }, [form]);
+
   const _onSave = useCallback(() => {
     form
       .validateFields()
       .then((values: any) => {
-        onSave(values);
+        onSave(values, onReset);
       })
       .catch((err) => {});
-  }, [form, onSave]);
+  }, [form, onSave, onReset]);
 
   return (
     <Modal
@@ -36,6 +42,7 @@ const SetupModal: React.FC<React.PropsWithChildren<SetupModalProps>> = ({
       onCancel={onCancel}
       onOk={_onSave}
       okText="Save"
+      confirmLoading={isSaving}
     >
       <Form
         layout="vertical"

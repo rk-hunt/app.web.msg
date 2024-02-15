@@ -16,4 +16,10 @@ type ResponseList<T> = Response<{
   page_context: PageContext;
 }>;
 
-export type { PageContext, Response, ResponseList };
+type SelectLabelInValue = {
+  key?: any;
+  value: any;
+  label: string;
+};
+
+export type { PageContext, Response, ResponseList, SelectLabelInValue };
