@@ -1,6 +1,7 @@
 type Provider = {
   _id: string;
   name: string;
+  token: string;
   created_at: number;
   updated_at: number;
 };

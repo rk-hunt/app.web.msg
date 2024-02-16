@@ -9,4 +9,14 @@ type Weight = {
   updated_at: number;
 };
 
-export type { Weight };
+type WeightInfo = {
+  type: string;
+  value: string;
+};
+
+type WeightFilterBy = {
+  type?: WeightType;
+  value?: string;
+};
+
+export type { Weight, WeightInfo, WeightFilterBy };

@@ -15,7 +15,7 @@ import { menus } from "./constants";
 
 const ProviderPage = lazy(() => import("./pages/Provider/providerPage"));
 const ServerPage = lazy(() => import("./pages/Provider/serverPage"));
-const BlacklistPage = lazy(() => import("./pages/Blacklist/blackListPage"));
+const BlacklistPage = lazy(() => import("./pages/Blacklist/blacklistPage"));
 
 const { Sider } = Layout;
 const onGetIcons = (name: string): React.ReactNode => {
