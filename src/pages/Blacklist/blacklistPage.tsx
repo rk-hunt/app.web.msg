@@ -101,6 +101,13 @@ const BlacklistPage: React.FC = () => {
     [onDelete]
   );
 
+  const onPaginationChanged = useCallback(
+    (page: number, _: number) => {
+      blacklistStore.onList(BlacklistURL.list, blacklistStore.filterBy, page);
+    },
+    [blacklistStore]
+  );
+
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
       {
@@ -217,6 +224,7 @@ const BlacklistPage: React.FC = () => {
                 total: pageContext.total,
                 showTotal: (total: number, range: any) =>
                   `${range[0]}-${range[1]} of ${total}`,
+                onChange: onPaginationChanged,
               }}
             />
           </Col>

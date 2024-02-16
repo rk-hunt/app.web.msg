@@ -1,5 +1,4 @@
 import { BlacklistType } from "../constants";
-import { SelectLabelInValue } from "./commonType";
 
 type Blacklist = {
   _id: string;
@@ -10,7 +9,7 @@ type Blacklist = {
 };
 
 type BlacklistInfo = {
-  type: SelectLabelInValue;
+  type: string;
   value: string;
 };
 

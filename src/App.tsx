@@ -15,7 +15,8 @@ import { menus } from "./constants";
 
 const ProviderPage = lazy(() => import("./pages/Provider/providerPage"));
 const ServerPage = lazy(() => import("./pages/Provider/serverPage"));
-const BlacklistPage = lazy(() => import("./pages/Blacklist/blackListPage"));
+const BlacklistPage = lazy(() => import("./pages/Blacklist/blacklistPage"));
+const WeightPage = lazy(() => import("./pages/Weight/weightPage"));
 
 const { Sider } = Layout;
 const onGetIcons = (name: string): React.ReactNode => {
@@ -84,6 +85,14 @@ const App: React.FC = () => {
             element={
               <AuthRoute>
                 <BlacklistPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/weights"
+            element={
+              <AuthRoute>
+                <WeightPage />
               </AuthRoute>
             }
           />
