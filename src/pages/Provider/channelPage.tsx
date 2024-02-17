@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 import dayjs from "dayjs";
+import { debounce } from "lodash";
 import {
   Button,
   Col,
@@ -23,20 +24,20 @@ import {
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import {
-  ProviderType,
-  ProviderURL,
-  ServerURL,
+  ChannelURL,
   datetimeFormat,
+  ServerChannelType,
+  ServerURL,
 } from "../../constants";
-import { Server, ServerFilterBy, ServerInfo } from "../../types";
+import { Channel, ChannelFilterBy, ServerInfo } from "../../types";
 import SetupModal from "../Partial/SetupModal";
 
 const { Content } = Layout;
 
-const ServerPage: React.FC = () => {
-  const { serverStore, providerStore } = useStores();
-  const { data: providers } = providerStore;
-  const { data, isFetching, pageContext, isSaving } = serverStore;
+const ChannelPage: React.FC = () => {
+  const { serverStore, channelStore } = useStores();
+  const { data: servers, isFetching: isFetchingServer } = serverStore;
+  const { data, isFetching, pageContext, isSaving } = channelStore;
 
   const [visibleModal, setVisibleModal] = useState(false);
   const [form] = Form.useForm<any>();
@@ -47,15 +48,15 @@ const ServerPage: React.FC = () => {
 
   const onApplyFilter = useCallback(
     (values: any) => {
-      const filter: ServerFilterBy = {
-        ...serverStore.filterBy,
+      const filter: ChannelFilterBy = {
+        ...channelStore.filterBy,
         ...values,
       };
 
-      serverStore.setFilterBy(filter);
-      serverStore.onList(ServerURL.list, filter);
+      channelStore.setFilterBy(filter);
+      channelStore.onList(ChannelURL.list, filter);
     },
-    [serverStore]
+    [channelStore]
   );
 
   const onSaved = useCallback(
@@ -69,15 +70,15 @@ const ServerPage: React.FC = () => {
 
   const onSave = useCallback(
     (info: ServerInfo, onReset: () => void) => {
-      serverStore.onSave(ServerURL.base, info, onSaved.bind(null, onReset));
+      channelStore.onSave(ChannelURL.base, info, onSaved.bind(null, onReset));
     },
-    [serverStore, onSaved]
+    [channelStore, onSaved]
   );
 
   const onDelete = useCallback(
     (id: string) => {
       return new Promise(async (resolve, rejects) => {
-        const response = await serverStore.onDelete(ServerURL.base, id);
+        const response = await channelStore.onDelete(ChannelURL.base, id);
         if (response) {
           resolve("success");
           return;
@@ -87,15 +88,15 @@ const ServerPage: React.FC = () => {
         return "error";
       });
     },
-    [serverStore]
+    [channelStore]
   );
 
   const onConfirmDeleting = useCallback(
-    (server: Server) => {
+    (channel: Channel) => {
       Modal.confirm({
-        title: "Delete Server",
-        content: `Do you want to delete server ${server.server_name}?`,
-        onOk: () => onDelete(server._id as string),
+        title: "Delete Channel",
+        content: `Do you want to delete channel ${channel.channel_name}?`,
+        onOk: () => onDelete(channel._id as string),
         centered: true,
         okText: "Yes",
         cancelText: "No",
@@ -106,24 +107,39 @@ const ServerPage: React.FC = () => {
 
   const onPaginationChanged = useCallback(
     (page: number, _: number) => {
-      serverStore.onList(ServerURL.list, serverStore.filterBy, page);
+      channelStore.onList(ChannelURL.list, channelStore.filterBy, page);
+    },
+    [channelStore]
+  );
+
+  const onSearchServer = useCallback(
+    (value: string) => {
+      serverStore.onList(ServerURL.list, { server_name: value });
     },
     [serverStore]
   );
+
+  const onSearch = useMemo(() => {
+    return debounce(onSearchServer, 800);
+  }, [onSearchServer]);
 
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
       {
         title: "Name",
-        dataIndex: "server_name",
+        dataIndex: "channel_name",
       },
       {
-        title: "Server Id",
-        dataIndex: "server_id",
+        title: "Channel Id",
+        dataIndex: "channel_id",
       },
       {
         title: "Type",
         dataIndex: "type",
+      },
+      {
+        title: "Server Name",
+        dataIndex: "server_name",
       },
       {
         title: "Provider",
@@ -146,7 +162,7 @@ const ServerPage: React.FC = () => {
       {
         title: "",
         dataIndex: "",
-        render: (_: any, record: Server) => {
+        render: (_: any, record: Channel) => {
           return (
             <Button
               icon={<DeleteOutlined />}
@@ -170,18 +186,22 @@ const ServerPage: React.FC = () => {
         onFinish={onApplyFilter}
         style={{ padding: 8, width: 300 }}
       >
-        <Form.Item label="Name" name="server_name">
-          <Input placeholder="Professor" allowClear />
+        <Form.Item label="Name" name="channel_name">
+          <Input placeholder="Announcement" allowClear />
         </Form.Item>
-        <Form.Item label="Server Id" name="server_id">
+        <Form.Item label="Channel Id" name="channel_id">
           <Input placeholder="00001" allowClear />
         </Form.Item>
-        <Form.Item label="Provider" name="provider_id">
+        <Form.Item label="Server" name="server_id">
           <Select
-            placeholder="Discord"
-            options={providers.map((provider) => ({
-              value: provider._id,
-              label: provider.name,
+            showSearch
+            filterOption={false}
+            loading={isFetchingServer}
+            onSearch={onSearch}
+            placeholder="General"
+            options={servers.map((server) => ({
+              value: server._id,
+              label: server.server_name,
             }))}
             allowClear
           />
@@ -191,20 +211,19 @@ const ServerPage: React.FC = () => {
         </Button>
       </Form>
     );
-  }, [form, providers, onApplyFilter]);
+  }, [form, servers, onApplyFilter, onSearch, isFetchingServer]);
 
   useEffect(() => {
-    serverStore.onList(ServerURL.list);
-    providerStore.onList(ProviderURL.list);
+    channelStore.onList(ChannelURL.list);
     return () => {
-      serverStore.onReset();
+      channelStore.onReset();
     };
-  }, [serverStore, providerStore]);
+  }, [channelStore]);
 
   return (
     <Content>
-      <Header title="Servers" />
-      <Page title="Servers">
+      <Header title="Channels" />
+      <Page title="Channels">
         <Row>
           <Col span={24} style={{ marginBottom: 24 }}>
             <Flex justify="space-between">
@@ -221,7 +240,7 @@ const ServerPage: React.FC = () => {
                 icon={<PlusOutlined />}
                 onClick={onOpenModal}
               >
-                New Server
+                New Channel
               </Button>
             </Flex>
           </Col>
@@ -246,35 +265,39 @@ const ServerPage: React.FC = () => {
         </Row>
       </Page>
       <SetupModal
-        title="New Server"
+        title="New Channel"
         visible={visibleModal}
         isSaving={isSaving}
         onCancel={onOpenModal}
         onSave={onSave}
       >
         <Form.Item
-          label="Provider"
-          name="provider_id"
+          label="Server"
+          name="server_id"
           rules={[{ required: true, message: "" }]}
         >
           <Select
-            placeholder="Discord"
-            options={providers.map((provider) => ({
-              value: provider._id,
-              label: provider.name,
+            showSearch
+            filterOption={false}
+            loading={isFetchingServer}
+            onSearch={onSearch}
+            placeholder="General"
+            options={servers.map((server) => ({
+              value: server._id,
+              label: server.server_name,
             }))}
           />
         </Form.Item>
         <Form.Item
           label="Name"
-          name="server_name"
+          name="channel_name"
           rules={[{ required: true, message: "" }]}
         >
           <Input placeholder="Professor" />
         </Form.Item>
         <Form.Item
-          label="Server Id"
-          name="server_id"
+          label="Channel Id"
+          name="channel_id"
           rules={[{ required: true, message: "" }]}
         >
           <Input placeholder="00001" />
@@ -285,11 +308,16 @@ const ServerPage: React.FC = () => {
           rules={[{ required: true, message: "" }]}
         >
           <Select
-            placeholder="Server"
+            placeholder="Channel"
             options={[
-              { value: ProviderType.Server, label: ProviderType.Server },
-              { value: ProviderType.Channel, label: ProviderType.Channel },
-              { value: ProviderType.Group, label: ProviderType.Group },
+              {
+                value: ServerChannelType.Channel,
+                label: ServerChannelType.Channel,
+              },
+              {
+                value: ServerChannelType.Topic,
+                label: ServerChannelType.Topic,
+              },
             ]}
           />
         </Form.Item>
@@ -298,4 +326,4 @@ const ServerPage: React.FC = () => {
   );
 };
 
-export default memo(observer(ServerPage));
+export default memo(observer(ChannelPage));
