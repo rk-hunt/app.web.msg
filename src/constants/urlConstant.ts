@@ -32,4 +32,17 @@ const WeightURL = {
   list: `${API_URL}/weights`,
 };
 
-export { AuthURL, ProviderURL, ServerURL, ChannelURL, BlacklistURL, WeightURL };
+const UserURL = {
+  base: `${API_URL}/user`,
+  list: `${API_URL}/users`,
+};
+
+export {
+  AuthURL,
+  ProviderURL,
+  ServerURL,
+  ChannelURL,
+  BlacklistURL,
+  WeightURL,
+  UserURL,
+};

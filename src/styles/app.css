@@ -52,3 +52,8 @@ body {
   margin-top: 16px;
   padding: 24px;
 }
+
+.avatar-container {
+  padding-left: 24px;
+  /* border: 1px solid; */
+}

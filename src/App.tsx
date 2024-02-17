@@ -9,13 +9,14 @@ import React, {
 } from "react";
 import { observer } from "mobx-react-lite";
 import { Routes, Route, Link } from "react-router-dom";
-import { Layout, Menu } from "antd";
+import { Button, Divider, Layout, Menu } from "antd";
 import {
   DiscordOutlined,
   FileDoneOutlined,
   GroupOutlined,
   MessageOutlined,
   PercentageOutlined,
+  PoweroffOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -28,6 +29,7 @@ const ServerPage = lazy(() => import("./pages/Provider/serverPage"));
 const ChannelPage = lazy(() => import("./pages/Provider/channelPage"));
 const BlacklistPage = lazy(() => import("./pages/Blacklist/blacklistPage"));
 const WeightPage = lazy(() => import("./pages/Weight/weightPage"));
+const UserPage = lazy(() => import("./pages/User/userPage"));
 
 const { Sider } = Layout;
 const onGetIcons = (name: string): React.ReactNode => {
@@ -51,12 +53,17 @@ const onGetIcons = (name: string): React.ReactNode => {
 
 const App: React.FC = () => {
   const { authStore } = useStores();
+  const { user } = authStore;
 
   const [selectedKey, setSelectedKey] = useState("providers");
 
   const onSelectedMenu = useCallback((menu: any) => {
     setSelectedKey(menu.key);
   }, []);
+
+  const onLogout = useCallback(() => {
+    authStore.onLogout();
+  }, [authStore]);
 
   const renderMenus = useMemo(() => {
     const menuItems = menus.map((menu) => {
@@ -87,6 +94,19 @@ const App: React.FC = () => {
         <div className="logo-container">
           <span className="logo-text">Token Info</span>
         </div>
+        {user.name && (
+          <div className="avatar-container">
+            <Button
+              icon={<PoweroffOutlined />}
+              shape="round"
+              type="dashed"
+              onClick={onLogout}
+            >
+              {user.name}
+            </Button>
+          </div>
+        )}
+        <Divider />
         <Menu
           mode="inline"
           items={renderMenus}
@@ -141,6 +161,14 @@ const App: React.FC = () => {
             element={
               <AuthRoute>
                 <WeightPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <AuthRoute>
+                <UserPage />
               </AuthRoute>
             }
           />

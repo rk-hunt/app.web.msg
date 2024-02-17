@@ -14,6 +14,7 @@ export default class AuthStore {
       onCheckAuth: action,
       onRequestOTP: action,
       onGetMe: action,
+      onLogout: action,
     });
   }
 
@@ -57,6 +58,16 @@ export default class AuthStore {
     if (status === HttpCode.Ok) {
       this.setUser(data.payload);
       return;
+    }
+
+    this.onCheckAuth(status, data.message);
+  }
+
+  async onLogout() {
+    const { status, data } = await httpPost(AuthURL.logout);
+    if (status === HttpCode.Ok) {
+      localStorage.clear();
+      window.location.href = "/login";
     }
 
     this.onCheckAuth(status, data.message);
