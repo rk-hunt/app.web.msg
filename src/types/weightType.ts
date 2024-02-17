@@ -12,6 +12,7 @@ type Weight = {
 type WeightInfo = {
   type: string;
   value: string;
+  weight: number;
 };
 
 type WeightFilterBy = {

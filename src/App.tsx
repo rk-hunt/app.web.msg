@@ -1,4 +1,13 @@
-import React, { Suspense, lazy, useMemo } from "react";
+import React, {
+  Suspense,
+  lazy,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { observer } from "mobx-react-lite";
 import { Routes, Route, Link } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import {
@@ -10,11 +19,13 @@ import {
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import useStores from "./stores";
 import { AuthRoute } from "./routes";
 import { menus } from "./constants";
 
 const ProviderPage = lazy(() => import("./pages/Provider/providerPage"));
 const ServerPage = lazy(() => import("./pages/Provider/serverPage"));
+const ChannelPage = lazy(() => import("./pages/Provider/channelPage"));
 const BlacklistPage = lazy(() => import("./pages/Blacklist/blacklistPage"));
 const WeightPage = lazy(() => import("./pages/Weight/weightPage"));
 
@@ -39,20 +50,36 @@ const onGetIcons = (name: string): React.ReactNode => {
 };
 
 const App: React.FC = () => {
+  const { authStore } = useStores();
+
+  const [selectedKey, setSelectedKey] = useState("providers");
+
+  const onSelectedMenu = useCallback((menu: any) => {
+    setSelectedKey(menu.key);
+  }, []);
+
   const renderMenus = useMemo(() => {
     const menuItems = menus.map((menu) => {
-      return (
-        <Menu.Item key={menu.key}>
+      return {
+        key: menu.key,
+        icon: onGetIcons(menu.icon),
+        label: (
           <Link to={menu.url}>
-            {menu.icon ? onGetIcons(menu.icon) : undefined}
             <span>{menu.name}</span>
           </Link>
-        </Menu.Item>
-      );
+        ),
+      };
     });
 
     return menuItems;
   }, []);
+
+  useEffect(() => {
+    const pathnames = window.location.pathname.split("/");
+    setSelectedKey(pathnames[1] || "providers");
+
+    authStore.onGetMe();
+  }, [authStore]);
 
   return (
     <Layout className="h-100-per">
@@ -60,10 +87,23 @@ const App: React.FC = () => {
         <div className="logo-container">
           <span className="logo-text">Token Info</span>
         </div>
-        <Menu mode="inline">{renderMenus}</Menu>
+        <Menu
+          mode="inline"
+          items={renderMenus}
+          onSelect={onSelectedMenu}
+          selectedKeys={[selectedKey]}
+        />
       </Sider>
       <Suspense fallback={<div />}>
         <Routes>
+          <Route
+            path="/"
+            element={
+              <AuthRoute>
+                <ProviderPage />
+              </AuthRoute>
+            }
+          />
           <Route
             path="/providers"
             element={
@@ -77,6 +117,14 @@ const App: React.FC = () => {
             element={
               <AuthRoute>
                 <ServerPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/channels"
+            element={
+              <AuthRoute>
+                <ChannelPage />
               </AuthRoute>
             }
           />
@@ -102,4 +150,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default memo(observer(App));

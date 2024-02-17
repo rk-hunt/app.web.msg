@@ -41,7 +41,6 @@ const WeightPage: React.FC = () => {
 
   const onApplyFilter = useCallback(
     (values: any) => {
-      console.log("values: ", values);
       const filter: WeightFilterBy = {
         ...weightStore.filterBy,
         ...values,
@@ -62,11 +61,11 @@ const WeightPage: React.FC = () => {
   );
   const onSave = useCallback(
     (info: WeightInfo, onReset: () => void) => {
+      info.weight = parseFloat(info.weight as any);
       weightStore.onSave(WeightURL.base, info, onSaved.bind(null, onReset));
     },
     [weightStore, onSaved]
   );
-
   const onDelete = useCallback(
     (id: string) => {
       return new Promise(async (resolve, rejects) => {
@@ -82,7 +81,6 @@ const WeightPage: React.FC = () => {
     },
     [weightStore]
   );
-
   const onConfirmDeleting = useCallback(
     (weight: Weight) => {
       Modal.confirm({
@@ -96,7 +94,6 @@ const WeightPage: React.FC = () => {
     },
     [onDelete]
   );
-
   const onPaginationChanged = useCallback(
     (page: number, _: number) => {
       weightStore.onList(WeightURL.list, weightStore.filterBy, page);
@@ -113,6 +110,10 @@ const WeightPage: React.FC = () => {
       {
         title: "Type",
         dataIndex: "type",
+      },
+      {
+        title: "Weight",
+        dataIndex: "weight",
       },
       {
         title: "Created At",
@@ -254,7 +255,14 @@ const WeightPage: React.FC = () => {
           name="value"
           rules={[{ required: true, message: "" }]}
         >
-          <Input placeholder="Blacklist" />
+          <Input placeholder="Professor" />
+        </Form.Item>
+        <Form.Item
+          label="Weight"
+          name="weight"
+          rules={[{ required: true, message: "" }]}
+        >
+          <Input placeholder="5" />
         </Form.Item>
       </SetupModal>
     </Content>

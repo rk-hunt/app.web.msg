@@ -23,4 +23,27 @@ enum BlacklistType {
   Keyword = "Keyword",
 }
 
-export { HttpCode, WeightType, BlacklistType };
+enum UserStatus {
+  Active = "Active",
+  Inactive = "Inactive",
+}
+
+enum ProviderType {
+  Server = "Server",
+  Channel = "Channel",
+  Group = "Group",
+}
+
+enum ServerChannelType {
+  Channel = "Channel",
+  Topic = "Topic",
+}
+
+export {
+  HttpCode,
+  WeightType,
+  BlacklistType,
+  UserStatus,
+  ProviderType,
+  ServerChannelType,
+};
