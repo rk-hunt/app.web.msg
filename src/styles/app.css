@@ -23,6 +23,11 @@ body {
   font-size: 18px;
 }
 
+.ant-table {
+  max-height: calc(100vh - 270px) !important;
+  overflow-y: auto !important;
+}
+
 .ant-table-cell {
   background: #ffffff !important;
 }

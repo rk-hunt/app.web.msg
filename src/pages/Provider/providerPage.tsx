@@ -27,10 +27,6 @@ const ProviderPage: React.FC = () => {
         dataIndex: "name",
       },
       {
-        title: "Token",
-        dataIndex: "token",
-      },
-      {
         title: "Created At",
         dataIndex: "created_at",
         render: (value: number) => {

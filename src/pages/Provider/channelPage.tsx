@@ -281,7 +281,7 @@ const ChannelPage: React.FC = () => {
             filterOption={false}
             loading={isFetchingServer}
             onSearch={onSearch}
-            placeholder="General"
+            placeholder="Type to search servers"
             options={servers.map((server) => ({
               value: server._id,
               label: server.server_name,
