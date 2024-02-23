@@ -6,6 +6,7 @@ import WeightStore from "./weightStore";
 import ServerStore from "./serverStore";
 import ChannelStore from "./channelStore";
 import UserStore from "./userStore";
+import MessageStore from "./messageStore";
 
 const authStore = new AuthStore();
 const providerStore = new ProviderStore(authStore);
@@ -14,6 +15,7 @@ const channelStore = new ChannelStore(authStore);
 const blacklistStore = new BlacklistStore(authStore);
 const weightStore = new WeightStore(authStore);
 const userStore = new UserStore(authStore);
+const messageStore = new MessageStore(authStore);
 
 const storesContext = React.createContext({
   authStore,
@@ -23,6 +25,7 @@ const storesContext = React.createContext({
   serverStore,
   channelStore,
   userStore,
+  messageStore,
 });
 
 const useStores = () => React.useContext(storesContext);

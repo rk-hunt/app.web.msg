@@ -62,3 +62,7 @@ body {
   padding-left: 24px;
   /* border: 1px solid; */
 }
+
+.text-highlight {
+  background-color: #ffff00;
+}

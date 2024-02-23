@@ -8,6 +8,10 @@ type Provider = {
   updated_at: number;
 };
 
+type ProviderInfo = {
+  token: string;
+};
+
 type Server = {
   _id: string;
   provider_id: string;
@@ -53,6 +57,7 @@ type ChannelFilterBy = {
 
 export type {
   Provider,
+  ProviderInfo,
   Server,
   ServerFilterBy,
   ServerInfo,

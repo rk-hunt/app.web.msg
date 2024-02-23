@@ -37,6 +37,10 @@ const UserURL = {
   list: `${API_URL}/users`,
 };
 
+const MessageURL = {
+  list: `${API_URL}/messages`,
+};
+
 export {
   AuthURL,
   ProviderURL,
@@ -45,4 +49,5 @@ export {
   BlacklistURL,
   WeightURL,
   UserURL,
+  MessageURL,
 };

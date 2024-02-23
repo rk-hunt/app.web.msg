@@ -2,7 +2,7 @@ import { observable, action, makeObservable } from "mobx";
 import { PageContext, Response, ResponseList } from "../types";
 import { HttpCode } from "../constants";
 import AuthStore from "./authStore";
-import { httpDelete, httpGet, httpPost } from "../utils";
+import { httpDelete, httpGet, httpPost, httpPut } from "../utils";
 import message from "../utils/message";
 
 export default class BaseStore<TData> {
@@ -65,11 +65,11 @@ export default class BaseStore<TData> {
 
     if (status === HttpCode.Ok) {
       this.setPageContext(data.payload.page_context);
-      this.setData(data.payload.data);
       this.setIsFetching(false);
       if (isReturnData) {
         return data.payload.data;
       }
+      this.setData(data.payload.data);
       return;
     }
 
@@ -84,6 +84,24 @@ export default class BaseStore<TData> {
     this.setIsSaving(true);
 
     const { status, data } = await httpPost<Response>(url, reqData);
+    if (status === HttpCode.Ok) {
+      this.setIsSaving(false);
+      message.success(data.message);
+      callback();
+      return;
+    }
+
+    this.setIsSaving(false);
+    this.authStore.onCheckAuth(status, data.message);
+  }
+
+  async onUpdate(url: string, reqData: any, callback: () => void) {
+    if (this.isSaving) {
+      return;
+    }
+    this.setIsSaving(true);
+
+    const { status, data } = await httpPut<Response>(url, reqData);
     if (status === HttpCode.Ok) {
       this.setIsSaving(false);
       message.success(data.message);
