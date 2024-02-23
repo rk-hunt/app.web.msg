@@ -15,11 +15,11 @@ import {
   Table,
   TableColumnsType,
 } from "antd";
-import { DeleteOutlined, FilterOutlined } from "@ant-design/icons";
+import { FilterOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
-import { MessageURL, datetimeFormat } from "../../constants";
-import { MessageFilterBy } from "../../types";
+import { MessageURL, ProviderURL, datetimeFormat } from "../../constants";
+import { Message, MessageFilterBy } from "../../types";
 
 const { Content } = Layout;
 const { RangePicker } = DatePicker;
@@ -39,7 +39,15 @@ const MessagePage: React.FC = () => {
   );
 
   const onApplyFilter = useCallback(
-    (values: any) => {
+    (values: MessageFilterBy) => {
+      if (values.received_at) {
+        const receivedAt = values.received_at as any;
+        values.received_at = {
+          start: dayjs(receivedAt[0] as any).valueOf(),
+          end: dayjs(receivedAt[1] as any).valueOf(),
+        };
+      }
+
       const filter: MessageFilterBy = {
         ...messageStore.filterBy,
         ...values,
@@ -77,24 +85,21 @@ const MessagePage: React.FC = () => {
         },
       },
       {
+        title: "content",
+        dataIndex: "content",
+        width: "30%",
+        render: (_: string, message: Message) => {
+          if (message.weight >= highlightWeight) {
+            return <span className="text-highlight">{message.content}</span>;
+          }
+          return message.content;
+        },
+      },
+      {
         title: "Created At",
         dataIndex: "created_at",
         render: (value: number) => {
           return dayjs(value).format(datetimeFormat);
-        },
-      },
-      {
-        title: "Updated At",
-        dataIndex: "updated_at",
-        render: (value: number) => {
-          return value === 0 ? "-" : dayjs(value).format(datetimeFormat);
-        },
-      },
-      {
-        title: "",
-        dataIndex: "",
-        render: (_: any) => {
-          return <Button icon={<DeleteOutlined />} size="small" />;
         },
       },
     ];
@@ -121,11 +126,8 @@ const MessagePage: React.FC = () => {
             allowClear
           />
         </Form.Item>
-        <Form.Item label="Auth Username" name="author_username">
+        <Form.Item label="Author" name="author_username">
           <Input placeholder="Username" allowClear />
-        </Form.Item>
-        <Form.Item label="Channel Id" name="channel_id">
-          <Input placeholder="00001" allowClear />
         </Form.Item>
         <Form.Item label="Received At" name="received_at">
           <RangePicker
@@ -155,10 +157,11 @@ const MessagePage: React.FC = () => {
 
   useEffect(() => {
     messageStore.onListMessages(MessageURL.list);
+    providerStore.onList(ProviderURL.list);
     return () => {
       messageStore.onReset();
     };
-  }, [messageStore]);
+  }, [messageStore, providerStore]);
 
   return (
     <Content>

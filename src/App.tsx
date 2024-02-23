@@ -30,6 +30,7 @@ const ChannelPage = lazy(() => import("./pages/Provider/channelPage"));
 const BlacklistPage = lazy(() => import("./pages/Blacklist/blacklistPage"));
 const WeightPage = lazy(() => import("./pages/Weight/weightPage"));
 const UserPage = lazy(() => import("./pages/User/userPage"));
+const MessagePage = lazy(() => import("./pages/Message/messgePage"));
 
 const { Sider } = Layout;
 const onGetIcons = (name: string): React.ReactNode => {
@@ -161,6 +162,14 @@ const App: React.FC = () => {
             element={
               <AuthRoute>
                 <WeightPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <AuthRoute>
+                <MessagePage />
               </AuthRoute>
             }
           />
