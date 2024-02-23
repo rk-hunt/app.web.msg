@@ -16,10 +16,9 @@ type ResponseList<T> = Response<{
   page_context: PageContext;
 }>;
 
-type SelectLabelInValue = {
-  key?: any;
-  value: any;
-  label: string;
+type DateRange = {
+  start: number;
+  end: number;
 };
 
-export type { PageContext, Response, ResponseList, SelectLabelInValue };
+export type { PageContext, Response, ResponseList, DateRange };

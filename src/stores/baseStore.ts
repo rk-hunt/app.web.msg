@@ -65,11 +65,11 @@ export default class BaseStore<TData> {
 
     if (status === HttpCode.Ok) {
       this.setPageContext(data.payload.page_context);
-      this.setData(data.payload.data);
       this.setIsFetching(false);
       if (isReturnData) {
         return data.payload.data;
       }
+      this.setData(data.payload.data);
       return;
     }
 
