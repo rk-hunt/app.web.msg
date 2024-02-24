@@ -6,6 +6,9 @@ ARG TOKEN_INFO_API_URL
 ENV NODE_ENV=production
 ENV REACT_APP_API_URL=$TOKEN_INFO_API_URL
 
+# output the value of the environment variable
+RUN echo "REACT_APP_API_URL=$TOKEN_INFO_API_URL"
+
 WORKDIR /app
 
 # copy project files to workdir
