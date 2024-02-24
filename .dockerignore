@@ -1,0 +1,11 @@
+node_modules/
+node_modules_linux/
+dist/
+.editorconfig
+.eslintrc.js
+.prettierrc.js
+.gitignore
+.git
+.dockeringore
+.env
+.env.sample

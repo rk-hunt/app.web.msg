@@ -1,0 +1,41 @@
+variables:
+  IMAGE_NAME: $CI_REGISTRY/web3205208/tokeninfo/app.web.token.info
+
+stages:
+  - build
+  - deploy
+
+build:
+  image: docker:25.0.3
+  services:
+    - docker:25.0.3-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  stage: build
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build \
+        --build-arg TOKEN_INFO_API_URL=http://localhost:8000/api/v1 \
+        -t $IMAGE_NAME:$CI_COMMIT_REF_NAME -f Dockerfile .
+    - docker push $IMAGE_NAME:$CI_COMMIT_REF_NAME
+  only:
+    - master
+
+build_prod:
+  image: docker:25.0.3
+  services:
+    - docker:25.0.3-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  stage: deploy
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build \
+        --build-arg TOKEN_INFO_API_URL= \
+        -t $IMAGE_NAME:prod -f Dockerfile .
+    - docker push $IMAGE_NAME:prod
+  only:
+    - tags
+  when: manual
