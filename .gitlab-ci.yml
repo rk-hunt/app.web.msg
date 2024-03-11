@@ -15,7 +15,7 @@ build:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build --build-arg TOKEN_INFO_API_URL="http://152.42.180.153:3001/api/v1" -t $IMAGE_NAME:$CI_COMMIT_REF_NAME -f Dockerfile .
+    - docker build --build-arg TOKEN_INFO_API_URL="http://192.168.0.93:3001/api/v1" -t $IMAGE_NAME:$CI_COMMIT_REF_NAME -f Dockerfile .
     - docker push $IMAGE_NAME:$CI_COMMIT_REF_NAME
   only:
     - master
