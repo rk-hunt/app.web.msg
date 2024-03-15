@@ -27,15 +27,16 @@ const { RangePicker } = DatePicker;
 const MessagePage: React.FC = () => {
   const { messageStore, providerStore } = useStores();
   const { data: providers } = providerStore;
-  const { data, isFetching, pageContext, highlightWeight } = messageStore;
+  const { data, isFetching, pageContext, highlightWeight, filterBy } =
+    messageStore;
 
   const [form] = Form.useForm<any>();
 
   const onPaginationChanged = useCallback(
     (page: number, _: number) => {
-      messageStore.onList(MessageURL.list, {}, page);
+      messageStore.onList(MessageURL.list, filterBy, page);
     },
-    [messageStore]
+    [messageStore, filterBy]
   );
 
   const onApplyFilter = useCallback(
@@ -188,6 +189,7 @@ const MessagePage: React.FC = () => {
               loading={isFetching}
               pagination={{
                 hideOnSinglePage: true,
+                showSizeChanger: false,
                 size: "default",
                 pageSize: pageContext.per_page,
                 current: pageContext.current_page,

@@ -135,6 +135,7 @@ const ProviderPage: React.FC = () => {
               loading={isFetching}
               pagination={{
                 hideOnSinglePage: true,
+                showSizeChanger: false,
                 size: "default",
                 pageSize: pageContext.per_page,
                 current: pageContext.current_page,
