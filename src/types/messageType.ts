@@ -26,4 +26,9 @@ type MessageFilterBy = {
   content?: string;
 };
 
-export type { Message, MessageFilterBy };
+type MessageRefreshInterval = {
+  key: number;
+  label: string;
+};
+
+export type { Message, MessageFilterBy, MessageRefreshInterval };

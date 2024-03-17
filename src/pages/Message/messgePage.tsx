@@ -5,6 +5,7 @@ import {
   Button,
   Col,
   DatePicker,
+  Dropdown,
   Flex,
   Form,
   Input,
@@ -15,10 +16,16 @@ import {
   Table,
   TableColumnsType,
 } from "antd";
-import { FilterOutlined } from "@ant-design/icons";
+import { FilterOutlined, ReloadOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
-import { MessageURL, ProviderURL, datetimeFormat } from "../../constants";
+import {
+  MessageURL,
+  ProviderURL,
+  datetimeFormat,
+  localStorageKey,
+  refreshItems,
+} from "../../constants";
 import { Message, MessageFilterBy } from "../../types";
 
 const { Content } = Layout;
@@ -27,8 +34,14 @@ const { RangePicker } = DatePicker;
 const MessagePage: React.FC = () => {
   const { messageStore, providerStore } = useStores();
   const { data: providers } = providerStore;
-  const { data, isFetching, pageContext, highlightWeight, filterBy } =
-    messageStore;
+  const {
+    data,
+    isFetching,
+    pageContext,
+    highlightWeight,
+    filterBy,
+    refreshInterval,
+  } = messageStore;
 
   const [form] = Form.useForm<any>();
 
@@ -60,18 +73,32 @@ const MessagePage: React.FC = () => {
     [messageStore]
   );
 
+  const onSelectedRefreshInterval = useCallback(
+    (menu: any) => {
+      messageStore.onChangeRefreshInterval(parseFloat(menu.key));
+    },
+    [messageStore]
+  );
+
+  const onCheckLocalInterval = useCallback(() => {
+    const refreshInterval = localStorage.getItem(localStorageKey.msgInterval);
+    if (refreshInterval) {
+      messageStore.onChangeRefreshInterval(JSON.parse(refreshInterval).key);
+    }
+  }, [messageStore]);
+
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
       {
-        title: "Provider Name",
+        title: "Provider",
         dataIndex: "provider_name",
       },
       {
-        title: "Server Name",
+        title: "Server",
         dataIndex: "server_name",
       },
       {
-        title: "Channel Name",
+        title: "Channel",
         dataIndex: "channel_name",
       },
       {
@@ -86,7 +113,7 @@ const MessagePage: React.FC = () => {
         },
       },
       {
-        title: "content",
+        title: "Content",
         dataIndex: "content",
         width: "30%",
         render: (_: string, message: Message) => {
@@ -159,10 +186,11 @@ const MessagePage: React.FC = () => {
   useEffect(() => {
     messageStore.onListMessages(MessageURL.list);
     providerStore.onList(ProviderURL.list);
+    onCheckLocalInterval();
     return () => {
       messageStore.onReset();
     };
-  }, [messageStore, providerStore]);
+  }, [messageStore, providerStore, onCheckLocalInterval]);
 
   return (
     <Content>
@@ -179,6 +207,17 @@ const MessagePage: React.FC = () => {
               >
                 <Button icon={<FilterOutlined />}>Filter</Button>
               </Popover>
+              <Dropdown
+                menu={{
+                  items: refreshItems,
+                  selectable: true,
+                  onSelect: onSelectedRefreshInterval,
+                }}
+              >
+                <Button
+                  icon={<ReloadOutlined />}
+                >{`Refresh Every ${refreshInterval.label}`}</Button>
+              </Dropdown>
             </Flex>
           </Col>
           <Col span={24}>

@@ -1,3 +1,5 @@
+import { MessageRefreshInterval } from "../types";
+
 const menus = [
   {
     name: "Providers",
@@ -45,4 +47,19 @@ const menus = [
 
 const datetimeFormat = "DD MMM YYYY hh:mm A";
 
-export { menus, datetimeFormat };
+const refreshItems: MessageRefreshInterval[] = [
+  { key: 0, label: "Off" },
+  // { key: 5000, label: "5s" },
+  // { key: 10000, label: "10s" },
+  { key: 30000, label: "30s" },
+  { key: 60000, label: "1m" },
+  { key: 300000, label: "5m" },
+  { key: 900000, label: "15m" },
+  { key: 1800000, label: "30m" },
+];
+
+const localStorageKey = {
+  msgInterval: "msg_interval",
+};
+
+export { menus, datetimeFormat, refreshItems, localStorageKey };

@@ -138,7 +138,7 @@ const ChannelPage: React.FC = () => {
         dataIndex: "type",
       },
       {
-        title: "Server Name",
+        title: "Server",
         dataIndex: "server_name",
       },
       {
