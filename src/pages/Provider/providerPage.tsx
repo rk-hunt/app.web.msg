@@ -4,18 +4,25 @@ import dayjs from "dayjs";
 import {
   Button,
   Col,
+  Flex,
   Form,
   Input,
   Layout,
   Row,
+  Select,
   Table,
   TableColumnsType,
   Tag,
 } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
-import { ProviderURL, datetimeFormat } from "../../constants";
+import {
+  ActionType,
+  ProviderType,
+  ProviderURL,
+  datetimeFormat,
+} from "../../constants";
 import SetupModal from "../Partial/SetupModal";
 import { Provider, ProviderInfo } from "../../types";
 
@@ -26,10 +33,13 @@ const ProviderPage: React.FC = () => {
   const { data, isFetching, pageContext, isSaving, provider } = providerStore;
 
   const [visibleModal, setVisibleModal] = useState(false);
+  const [visibleSetupModal, setVisibleSetupModal] = useState(false);
+  const [actionType, setActionType] = useState(ActionType.Create);
 
   const onOpenModal = useCallback(
     (provider: Provider) => {
       providerStore.setProvider(provider);
+      setActionType(ActionType.Set);
       setVisibleModal(true);
     },
     [providerStore]
@@ -37,6 +47,15 @@ const ProviderPage: React.FC = () => {
 
   const onCloseModal = useCallback(() => {
     setVisibleModal(false);
+  }, []);
+
+  const onOpenSetupModal = useCallback(() => {
+    setActionType(ActionType.Create);
+    setVisibleSetupModal(true);
+  }, []);
+
+  const onCloseSetupModal = useCallback(() => {
+    setVisibleSetupModal(false);
   }, []);
 
   const onPaginationChanged = useCallback(
@@ -49,6 +68,7 @@ const ProviderPage: React.FC = () => {
   const onSaved = useCallback(
     (onReset: () => void) => {
       setVisibleModal(false);
+      setVisibleSetupModal(false);
       providerStore.onList(ProviderURL.list);
       onReset();
     },
@@ -57,13 +77,21 @@ const ProviderPage: React.FC = () => {
 
   const onSave = useCallback(
     (info: ProviderInfo, onReset: () => void) => {
-      providerStore.onUpdate(
-        `${ProviderURL.base}/${provider._id}`,
-        info,
-        onSaved.bind(null, onReset)
-      );
+      if (actionType === ActionType.Create) {
+        providerStore.onSave(
+          ProviderURL.base,
+          info,
+          onSaved.bind(null, onReset)
+        );
+      } else if (actionType === ActionType.Set) {
+        providerStore.onUpdate(
+          `${ProviderURL.base}/${provider._id}`,
+          info,
+          onSaved.bind(null, onReset)
+        );
+      }
     },
-    [providerStore, provider, onSaved]
+    [providerStore, provider, actionType, onSaved]
   );
 
   const tableColumns = useMemo(() => {
@@ -71,6 +99,10 @@ const ProviderPage: React.FC = () => {
       {
         title: "Name",
         dataIndex: "name",
+      },
+      {
+        title: "Type",
+        dataIndex: "type",
       },
       {
         title: "Token",
@@ -127,6 +159,17 @@ const ProviderPage: React.FC = () => {
       <Header title="Providers" />
       <Page title="Providers">
         <Row>
+          <Col span={24} style={{ marginBottom: 24 }}>
+            <Flex justify="flex-end">
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={onOpenSetupModal}
+              >
+                New Provider
+              </Button>
+            </Flex>
+          </Col>
           <Col span={24}>
             <Table
               rowKey="_id"
@@ -148,6 +191,8 @@ const ProviderPage: React.FC = () => {
           </Col>
         </Row>
       </Page>
+
+      {/* set|unset token */}
       <SetupModal
         title="Set Token"
         visible={visibleModal}
@@ -155,6 +200,49 @@ const ProviderPage: React.FC = () => {
         onCancel={onCloseModal}
         onSave={onSave}
       >
+        <Form.Item
+          label="Token"
+          name="token"
+          rules={[{ required: true, message: "" }]}
+        >
+          <Input placeholder="Token" />
+        </Form.Item>
+      </SetupModal>
+
+      {/* create provider modal */}
+      <SetupModal
+        title="New Provider"
+        visible={visibleSetupModal}
+        isSaving={isSaving}
+        onCancel={onCloseSetupModal}
+        onSave={onSave}
+      >
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: "" }]}
+        >
+          <Input placeholder="Professor DC" />
+        </Form.Item>
+        <Form.Item
+          label="Type"
+          name="type"
+          rules={[{ required: true, message: "" }]}
+        >
+          <Select
+            placeholder={ProviderType.Discord}
+            options={[
+              {
+                value: ProviderType.Discord,
+                label: ProviderType.Discord,
+              },
+              {
+                value: ProviderType.Telegram,
+                label: ProviderType.Telegram,
+              },
+            ]}
+          />
+        </Form.Item>
         <Form.Item
           label="Token"
           name="token"

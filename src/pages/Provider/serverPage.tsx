@@ -23,7 +23,7 @@ import {
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import {
-  ProviderType,
+  ProviderServerType,
   ProviderURL,
   ServerURL,
   datetimeFormat,
@@ -288,9 +288,18 @@ const ServerPage: React.FC = () => {
           <Select
             placeholder="Server"
             options={[
-              { value: ProviderType.Server, label: ProviderType.Server },
-              { value: ProviderType.Channel, label: ProviderType.Channel },
-              { value: ProviderType.Group, label: ProviderType.Group },
+              {
+                value: ProviderServerType.Server,
+                label: ProviderServerType.Server,
+              },
+              {
+                value: ProviderServerType.Channel,
+                label: ProviderServerType.Channel,
+              },
+              {
+                value: ProviderServerType.Group,
+                label: ProviderServerType.Group,
+              },
             ]}
           />
         </Form.Item>

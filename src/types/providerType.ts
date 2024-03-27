@@ -1,4 +1,4 @@
-import { ProviderType, ServerChannelType } from "../constants";
+import { ProviderServerType, ServerChannelType } from "../constants";
 
 type Provider = {
   _id: string;
@@ -16,7 +16,7 @@ type Server = {
   _id: string;
   provider_id: string;
   provider_name: string;
-  type: ProviderType;
+  type: ProviderServerType;
   server_id: string;
   server_name: string;
   created_at: number;
@@ -31,7 +31,7 @@ type ServerFilterBy = {
 
 type ServerInfo = {
   provider_id: string;
-  type: ProviderType;
+  type: ProviderServerType;
   server_id: string;
   server_name: string;
 };

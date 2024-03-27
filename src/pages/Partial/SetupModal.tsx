@@ -38,6 +38,7 @@ const SetupModal: React.FC<React.PropsWithChildren<SetupModalProps>> = ({
       width={450}
       centered
       closable={false}
+      maskClosable={false}
       open={visible}
       onCancel={onCancel}
       onOk={_onSave}

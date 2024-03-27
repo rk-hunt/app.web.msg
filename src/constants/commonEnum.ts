@@ -29,6 +29,11 @@ enum UserStatus {
 }
 
 enum ProviderType {
+  Discord = "Discord",
+  Telegram = "Telegram",
+}
+
+enum ProviderServerType {
   Server = "Server",
   Channel = "Channel",
   Group = "Group",
@@ -39,11 +44,19 @@ enum ServerChannelType {
   Topic = "Topic",
 }
 
+enum ActionType {
+  Create = 1,
+  Update = 2,
+  Set = 3,
+}
+
 export {
   HttpCode,
   WeightType,
   BlacklistType,
   UserStatus,
   ProviderType,
+  ProviderServerType,
   ServerChannelType,
+  ActionType,
 };
