@@ -45,7 +45,7 @@ const menus = [
   },
 ];
 
-const datetimeFormat = "DD MMM YYYY hh:mm A";
+const datetimeFormat = "DD/MM/YY HH:mm:ss";
 
 const refreshItems: MessageRefreshInterval[] = [
   { key: 0, label: "Off" },

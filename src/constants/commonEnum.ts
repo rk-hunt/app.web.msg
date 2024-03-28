@@ -34,14 +34,14 @@ enum ProviderType {
 }
 
 enum ProviderServerType {
-  Server = "Server",
-  Channel = "Channel",
-  Group = "Group",
+  DCServer = "DC Server",
+  TGChannel = "TG Channel",
+  TGGroup = "TG Group",
 }
 
 enum ServerChannelType {
-  Channel = "Channel",
-  Topic = "Topic",
+  DCChannel = "DC Channel",
+  TGTopic = "TG Topic",
 }
 
 enum ActionType {

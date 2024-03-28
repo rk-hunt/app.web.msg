@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 import dayjs from "dayjs";
+import { debounce } from "lodash";
 import {
   Button,
   Col,
@@ -12,38 +13,52 @@ import {
   Popover,
   Row,
   Select,
+  Space,
   Table,
   TableColumnsType,
 } from "antd";
 import {
   DeleteOutlined,
+  EditOutlined,
   FilterOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import {
-  ProviderServerType,
+  ActionType,
   ProviderURL,
   ServerURL,
   datetimeFormat,
 } from "../../constants";
-import { Server, ServerFilterBy, ServerInfo } from "../../types";
+import {
+  SelectLabelInValue,
+  Server,
+  ServerFilterBy,
+  ServerInfo,
+  ServerReqInfo,
+} from "../../types";
 import SetupModal from "../Partial/SetupModal";
 
 const { Content } = Layout;
 
 const ServerPage: React.FC = () => {
   const { serverStore, providerStore } = useStores();
-  const { data: providers } = providerStore;
-  const { data, isFetching, pageContext, isSaving } = serverStore;
+  const { data: providers, isFetching: isFetchingProvider } = providerStore;
+  const { data, isFetching, pageContext, isSaving, serverInfo, providerTypes } =
+    serverStore;
 
-  const [visibleModal, setVisibleModal] = useState(false);
   const [form] = Form.useForm<any>();
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [actionType, setActionType] = useState(ActionType.Create);
 
-  const onOpenModal = useCallback(() => {
-    setVisibleModal(!visibleModal);
-  }, [visibleModal]);
+  const onOpenModal = useCallback(
+    (action: ActionType) => {
+      setActionType(action);
+      setVisibleModal(!visibleModal);
+    },
+    [visibleModal]
+  );
 
   const onApplyFilter = useCallback(
     (values: any) => {
@@ -69,9 +84,27 @@ const ServerPage: React.FC = () => {
 
   const onSave = useCallback(
     (info: ServerInfo, onReset: () => void) => {
-      serverStore.onSave(ServerURL.base, info, onSaved.bind(null, onReset));
+      const { provider, ...rest } = info;
+      const reqInfo: ServerReqInfo = {
+        ...rest,
+        provider_id: provider.value,
+      };
+
+      if (actionType === ActionType.Create) {
+        serverStore.onSave(
+          ServerURL.base,
+          reqInfo,
+          onSaved.bind(null, onReset)
+        );
+      } else {
+        serverStore.onUpdate(
+          `${ServerURL.base}/${serverInfo._id}`,
+          reqInfo,
+          onSaved.bind(null, onReset)
+        );
+      }
     },
-    [serverStore, onSaved]
+    [serverStore, onSaved, actionType, serverInfo]
   );
 
   const onDelete = useCallback(
@@ -104,11 +137,47 @@ const ServerPage: React.FC = () => {
     [onDelete]
   );
 
+  const onEdit = useCallback(
+    (info: Server) => {
+      const serverInfo: ServerInfo = {
+        ...info,
+        provider: {
+          value: info.provider_id,
+          label: info.provider_name,
+        },
+      };
+      serverStore.setServerInfo(serverInfo);
+      onOpenModal(ActionType.Update);
+    },
+    [serverStore, onOpenModal]
+  );
+
   const onPaginationChanged = useCallback(
     (page: number, _: number) => {
       serverStore.onList(ServerURL.list, serverStore.filterBy, page);
     },
     [serverStore]
+  );
+
+  const onSearchServer = useCallback(
+    (value: string) => {
+      providerStore.onList(ProviderURL.list, { name: value });
+    },
+    [providerStore]
+  );
+
+  const onSearch = useMemo(() => {
+    return debounce(onSearchServer, 800);
+  }, [onSearchServer]);
+
+  const onSelectedProvider = useCallback(
+    (value: SelectLabelInValue) => {
+      const provider = providers.find((prov) => prov._id === value.value);
+      if (provider) {
+        serverStore.setProviderTypes(provider.type);
+      }
+    },
+    [providers, serverStore]
   );
 
   const tableColumns = useMemo(() => {
@@ -148,18 +217,26 @@ const ServerPage: React.FC = () => {
         dataIndex: "",
         render: (_: any, record: Server) => {
           return (
-            <Button
-              icon={<DeleteOutlined />}
-              size="small"
-              onClick={onConfirmDeleting.bind(null, record)}
-            />
+            <Space>
+              <Button
+                icon={<EditOutlined />}
+                size="small"
+                onClick={onEdit.bind(null, record)}
+              />
+
+              <Button
+                icon={<DeleteOutlined />}
+                size="small"
+                onClick={onConfirmDeleting.bind(null, record)}
+              />
+            </Space>
           );
         },
       },
     ];
 
     return columns;
-  }, [onConfirmDeleting]);
+  }, [onConfirmDeleting, onEdit]);
 
   const filterForm = useMemo(() => {
     return (
@@ -195,11 +272,10 @@ const ServerPage: React.FC = () => {
 
   useEffect(() => {
     serverStore.onList(ServerURL.list);
-    providerStore.onList(ProviderURL.list);
     return () => {
       serverStore.onReset();
     };
-  }, [serverStore, providerStore]);
+  }, [serverStore]);
 
   return (
     <Content>
@@ -219,7 +295,7 @@ const ServerPage: React.FC = () => {
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                onClick={onOpenModal}
+                onClick={onOpenModal.bind(null, ActionType.Create)}
               >
                 New Server
               </Button>
@@ -247,19 +323,31 @@ const ServerPage: React.FC = () => {
         </Row>
       </Page>
       <SetupModal
-        title="New Server"
+        title={
+          actionType === ActionType.Create
+            ? "New Server"
+            : `Edit Server ${serverInfo.server_name}`
+        }
         visible={visibleModal}
         isSaving={isSaving}
-        onCancel={onOpenModal}
+        actionType={actionType}
+        data={serverInfo}
+        onCancel={onOpenModal.bind(null, ActionType.Create)}
         onSave={onSave}
       >
         <Form.Item
           label="Provider"
-          name="provider_id"
+          name="provider"
           rules={[{ required: true, message: "" }]}
         >
           <Select
-            placeholder="Discord"
+            showSearch
+            filterOption={false}
+            loading={isFetchingProvider}
+            onSearch={onSearch}
+            onSelect={onSelectedProvider}
+            placeholder="Type to search"
+            labelInValue
             options={providers.map((provider) => ({
               value: provider._id,
               label: provider.name,
@@ -285,23 +373,7 @@ const ServerPage: React.FC = () => {
           name="type"
           rules={[{ required: true, message: "" }]}
         >
-          <Select
-            placeholder="Server"
-            options={[
-              {
-                value: ProviderServerType.Server,
-                label: ProviderServerType.Server,
-              },
-              {
-                value: ProviderServerType.Channel,
-                label: ProviderServerType.Channel,
-              },
-              {
-                value: ProviderServerType.Group,
-                label: ProviderServerType.Group,
-              },
-            ]}
-          />
+          <Select placeholder="Server" options={providerTypes} />
         </Form.Item>
       </SetupModal>
     </Content>

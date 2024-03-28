@@ -123,13 +123,6 @@ const MessagePage: React.FC = () => {
           return message.content;
         },
       },
-      {
-        title: "Created At",
-        dataIndex: "created_at",
-        render: (value: number) => {
-          return dayjs(value).format(datetimeFormat);
-        },
-      },
     ];
 
     return columns;

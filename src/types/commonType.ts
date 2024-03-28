@@ -21,4 +21,16 @@ type DateRange = {
   end: number;
 };
 
-export type { PageContext, Response, ResponseList, DateRange };
+type SelectLabelInValue = {
+  key?: any;
+  value: any;
+  label: string;
+};
+
+export type {
+  PageContext,
+  Response,
+  ResponseList,
+  DateRange,
+  SelectLabelInValue,
+};

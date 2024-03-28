@@ -13,23 +13,31 @@ import {
   Popover,
   Row,
   Select,
+  Space,
   Table,
   TableColumnsType,
 } from "antd";
 import {
   DeleteOutlined,
+  EditOutlined,
   FilterOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import {
+  ActionType,
   ChannelURL,
   datetimeFormat,
-  ServerChannelType,
   ServerURL,
 } from "../../constants";
-import { Channel, ChannelFilterBy, ServerInfo } from "../../types";
+import {
+  Channel,
+  ChannelFilterBy,
+  ChannelInfo,
+  ChannelReqInfo,
+  SelectLabelInValue,
+} from "../../types";
 import SetupModal from "../Partial/SetupModal";
 
 const { Content } = Layout;
@@ -37,14 +45,20 @@ const { Content } = Layout;
 const ChannelPage: React.FC = () => {
   const { serverStore, channelStore } = useStores();
   const { data: servers, isFetching: isFetchingServer } = serverStore;
-  const { data, isFetching, pageContext, isSaving } = channelStore;
+  const { data, isFetching, pageContext, isSaving, serverTypes, channelInfo } =
+    channelStore;
 
-  const [visibleModal, setVisibleModal] = useState(false);
   const [form] = Form.useForm<any>();
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [actionType, setActionType] = useState(ActionType.Create);
 
-  const onOpenModal = useCallback(() => {
-    setVisibleModal(!visibleModal);
-  }, [visibleModal]);
+  const onOpenModal = useCallback(
+    (action: ActionType) => {
+      setActionType(action);
+      setVisibleModal(!visibleModal);
+    },
+    [visibleModal]
+  );
 
   const onApplyFilter = useCallback(
     (values: any) => {
@@ -69,10 +83,28 @@ const ChannelPage: React.FC = () => {
   );
 
   const onSave = useCallback(
-    (info: ServerInfo, onReset: () => void) => {
-      channelStore.onSave(ChannelURL.base, info, onSaved.bind(null, onReset));
+    (info: ChannelInfo, onReset: () => void) => {
+      const { server, ...rest } = info;
+      const reqInfo: ChannelReqInfo = {
+        ...rest,
+        server_id: server.value,
+      };
+
+      if (actionType === ActionType.Create) {
+        channelStore.onSave(
+          ChannelURL.base,
+          reqInfo,
+          onSaved.bind(null, onReset)
+        );
+      } else {
+        channelStore.onUpdate(
+          `${ChannelURL.base}/${channelInfo._id}`,
+          reqInfo,
+          onSaved.bind(null, onReset)
+        );
+      }
     },
-    [channelStore, onSaved]
+    [channelStore, onSaved, actionType, channelInfo]
   );
 
   const onDelete = useCallback(
@@ -105,6 +137,21 @@ const ChannelPage: React.FC = () => {
     [onDelete]
   );
 
+  const onEdit = useCallback(
+    (info: Channel) => {
+      const channelInfo: ChannelInfo = {
+        ...info,
+        server: {
+          value: info.server_id,
+          label: info.server_name,
+        },
+      };
+      channelStore.setChannelInfo(channelInfo);
+      onOpenModal(ActionType.Update);
+    },
+    [channelStore, onOpenModal]
+  );
+
   const onPaginationChanged = useCallback(
     (page: number, _: number) => {
       channelStore.onList(ChannelURL.list, channelStore.filterBy, page);
@@ -122,6 +169,16 @@ const ChannelPage: React.FC = () => {
   const onSearch = useMemo(() => {
     return debounce(onSearchServer, 800);
   }, [onSearchServer]);
+
+  const onSelectedServer = useCallback(
+    (value: SelectLabelInValue) => {
+      const selectServer = servers.find((server) => server._id === value.value);
+      if (selectServer) {
+        channelStore.setServerTypes(selectServer.type);
+      }
+    },
+    [servers, channelStore]
+  );
 
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
@@ -164,18 +221,26 @@ const ChannelPage: React.FC = () => {
         dataIndex: "",
         render: (_: any, record: Channel) => {
           return (
-            <Button
-              icon={<DeleteOutlined />}
-              size="small"
-              onClick={onConfirmDeleting.bind(null, record)}
-            />
+            <Space>
+              <Button
+                icon={<EditOutlined />}
+                size="small"
+                onClick={onEdit.bind(null, record)}
+              />
+
+              <Button
+                icon={<DeleteOutlined />}
+                size="small"
+                onClick={onConfirmDeleting.bind(null, record)}
+              />
+            </Space>
           );
         },
       },
     ];
 
     return columns;
-  }, [onConfirmDeleting]);
+  }, [onConfirmDeleting, onEdit]);
 
   const filterForm = useMemo(() => {
     return (
@@ -238,7 +303,7 @@ const ChannelPage: React.FC = () => {
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                onClick={onOpenModal}
+                onClick={onOpenModal.bind(null, ActionType.Create)}
               >
                 New Channel
               </Button>
@@ -266,15 +331,21 @@ const ChannelPage: React.FC = () => {
         </Row>
       </Page>
       <SetupModal
-        title="New Channel"
+        title={
+          actionType === ActionType.Create
+            ? "New Channel"
+            : `Edit Channel ${channelInfo.channel_name}`
+        }
         visible={visibleModal}
         isSaving={isSaving}
-        onCancel={onOpenModal}
+        actionType={actionType}
+        data={channelInfo}
+        onCancel={onOpenModal.bind(null, ActionType.Create)}
         onSave={onSave}
       >
         <Form.Item
           label="Server"
-          name="server_id"
+          name="server"
           rules={[{ required: true, message: "" }]}
         >
           <Select
@@ -282,7 +353,9 @@ const ChannelPage: React.FC = () => {
             filterOption={false}
             loading={isFetchingServer}
             onSearch={onSearch}
+            onSelect={onSelectedServer}
             placeholder="Type to search servers"
+            labelInValue
             options={servers.map((server) => ({
               value: server._id,
               label: server.server_name,
@@ -308,19 +381,7 @@ const ChannelPage: React.FC = () => {
           name="type"
           rules={[{ required: true, message: "" }]}
         >
-          <Select
-            placeholder="Channel"
-            options={[
-              {
-                value: ServerChannelType.Channel,
-                label: ServerChannelType.Channel,
-              },
-              {
-                value: ServerChannelType.Topic,
-                label: ServerChannelType.Topic,
-              },
-            ]}
-          />
+          <Select placeholder="Channel" options={serverTypes} />
         </Form.Item>
       </SetupModal>
     </Content>

@@ -1,10 +1,13 @@
 import { Form, Modal } from "antd";
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useEffect } from "react";
+import { ActionType } from "../../constants";
 
 type SetupModalProps = {
   title: string;
   visible: boolean;
   isSaving: boolean;
+  actionType?: ActionType;
+  data?: any;
   onCancel: () => void;
   onSave: (values: any, callback: () => void) => void;
 };
@@ -13,6 +16,8 @@ const SetupModal: React.FC<React.PropsWithChildren<SetupModalProps>> = ({
   title,
   visible,
   isSaving,
+  actionType = ActionType.Create,
+  data,
   onCancel,
   onSave,
   children,
@@ -23,6 +28,11 @@ const SetupModal: React.FC<React.PropsWithChildren<SetupModalProps>> = ({
     form.resetFields();
   }, [form]);
 
+  const _onCancel = useCallback(() => {
+    form.resetFields();
+    onCancel();
+  }, [onCancel, form]);
+
   const _onSave = useCallback(() => {
     form
       .validateFields()
@@ -32,6 +42,12 @@ const SetupModal: React.FC<React.PropsWithChildren<SetupModalProps>> = ({
       .catch((err) => {});
   }, [form, onSave, onReset]);
 
+  useEffect(() => {
+    if (actionType === ActionType.Update) {
+      form.setFieldsValue(data);
+    }
+  }, [actionType, data, form]);
+
   return (
     <Modal
       title={title}
@@ -40,7 +56,7 @@ const SetupModal: React.FC<React.PropsWithChildren<SetupModalProps>> = ({
       closable={false}
       maskClosable={false}
       open={visible}
-      onCancel={onCancel}
+      onCancel={_onCancel}
       onOk={_onSave}
       okText="Save"
       confirmLoading={isSaving}
