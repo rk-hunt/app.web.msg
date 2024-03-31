@@ -12,12 +12,14 @@ import { Routes, Route, Link } from "react-router-dom";
 import { Button, Divider, Layout, Menu } from "antd";
 import {
   DiscordOutlined,
+  DownloadOutlined,
   FileDoneOutlined,
   GroupOutlined,
   MessageOutlined,
   PercentageOutlined,
   PoweroffOutlined,
   TeamOutlined,
+  UploadOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import useStores from "./stores";
@@ -31,6 +33,7 @@ const BlacklistPage = lazy(() => import("./pages/Blacklist/blacklistPage"));
 const WeightPage = lazy(() => import("./pages/Weight/weightPage"));
 const UserPage = lazy(() => import("./pages/User/userPage"));
 const MessagePage = lazy(() => import("./pages/Message/messgePage"));
+const ExportPage = lazy(() => import("./pages/export/exportPage"));
 
 const { Sider } = Layout;
 const onGetIcons = (name: string): React.ReactNode => {
@@ -49,6 +52,10 @@ const onGetIcons = (name: string): React.ReactNode => {
       return <MessageOutlined />;
     case "users":
       return <UserOutlined />;
+    case "exports":
+      return <UploadOutlined />;
+    case "imports":
+      return <DownloadOutlined />;
   }
 };
 
@@ -178,6 +185,14 @@ const App: React.FC = () => {
             element={
               <AuthRoute>
                 <UserPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/exports"
+            element={
+              <AuthRoute>
+                <ExportPage />
               </AuthRoute>
             }
           />

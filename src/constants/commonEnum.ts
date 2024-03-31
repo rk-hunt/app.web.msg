@@ -50,6 +50,19 @@ enum ActionType {
   Set = 3,
 }
 
+enum ImportExportConfig {
+  Providers = "Providers",
+  Servers = "Servers",
+  Channels = "Channels",
+  Blacklist = "Blacklist",
+  Weights = "Weights",
+}
+
+enum ImportExportExtension {
+  csv = "csv",
+  xlsx = "xlsx",
+}
+
 export {
   HttpCode,
   WeightType,
@@ -59,4 +72,6 @@ export {
   ProviderServerType,
   ServerChannelType,
   ActionType,
+  ImportExportConfig,
+  ImportExportExtension,
 };

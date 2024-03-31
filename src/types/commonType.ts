@@ -27,10 +27,16 @@ type SelectLabelInValue = {
   label: string;
 };
 
+type ExportOption = {
+  url: string;
+  fields: string[];
+};
+
 export type {
   PageContext,
   Response,
   ResponseList,
   DateRange,
   SelectLabelInValue,
+  ExportOption,
 };

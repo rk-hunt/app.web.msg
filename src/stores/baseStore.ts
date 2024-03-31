@@ -1,14 +1,21 @@
 import { observable, action, makeObservable } from "mobx";
 import { PageContext, Response, ResponseList } from "../types";
-import { HttpCode } from "../constants";
+import { HttpCode, ImportExportExtension } from "../constants";
 import AuthStore from "./authStore";
-import { httpDelete, httpGet, httpPost, httpPut } from "../utils";
+import {
+  exportToExcel,
+  httpDelete,
+  httpGet,
+  httpPost,
+  httpPut,
+} from "../utils";
 import message from "../utils/message";
 
 export default class BaseStore<TData> {
   authStore: AuthStore;
   isFetching = false;
   isSaving = false;
+  isExporting = false;
   data: TData[] = [];
   pageContext: PageContext = {
     current_page: 1,
@@ -22,13 +29,15 @@ export default class BaseStore<TData> {
     makeObservable(this, {
       isFetching: observable,
       isSaving: observable,
+      setIsFetching: observable,
       data: observable,
       pageContext: observable,
       setData: action,
-      setIsFetching: action,
       setIsSaving: action,
+      setIsExporting: action,
       setPageContext: action,
       onList: action,
+      onExport: action,
     });
   }
 
@@ -37,6 +46,9 @@ export default class BaseStore<TData> {
   }
   setIsSaving(val: boolean) {
     this.isSaving = val;
+  }
+  setIsExporting(val: boolean) {
+    this.isExporting = val;
   }
   setData(val: TData[]) {
     this.data = val;
@@ -124,9 +136,57 @@ export default class BaseStore<TData> {
     return false;
   }
 
+  async onExport(
+    url: string,
+    exportFields: string[],
+    extension: ImportExportExtension,
+    filename: string
+  ): Promise<void> {
+    this.setIsExporting(true);
+    const { status, data } = await httpGet<ResponseList<TData[]>>(url, {
+      params: { page: 1, limit: 50 },
+    });
+
+    if (status === HttpCode.Ok) {
+      if (data.payload.data.length > 0) {
+        const pageContext = data.payload.page_context;
+        const exportData: any[] = data.payload.data;
+        if (pageContext.total > 1) {
+          for (let i = 2; i <= pageContext.last_page; i++) {
+            const { status: st, data: d } = await httpGet<
+              ResponseList<TData[]>
+            >(url, { params: { page: i, limit: 50 } });
+            if (st === HttpCode.Ok) {
+              exportData.push(d.payload.data);
+            }
+          }
+        }
+
+        // loop only wanted data to export
+        const exportDocs: any[] = [];
+        for (const expData of exportData) {
+          const exportDoc: Record<string, any> = {};
+          for (const exportField of exportFields) {
+            exportDoc[exportField] = expData[exportField];
+          }
+          exportDocs.push(exportDoc);
+        }
+
+        this.setIsExporting(false);
+        exportToExcel(exportDocs, exportFields, filename, extension);
+        return;
+      }
+      this.setIsExporting(false);
+      message.info(`There no ${filename} to exports`);
+      return;
+    }
+    this.authStore.onCheckAuth(status, data.message);
+  }
+
   onReset(): void {
     this.setIsFetching(false);
     this.setIsSaving(false);
+    this.setIsExporting(false);
     this.setData([]);
   }
 }

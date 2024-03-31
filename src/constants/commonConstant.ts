@@ -43,6 +43,18 @@ const menus = [
     url: "/users",
     key: "users",
   },
+  {
+    name: "Imports",
+    icon: "imports",
+    url: "/imports",
+    key: "imports",
+  },
+  {
+    name: "Exports",
+    icon: "exports",
+    url: "/exports",
+    key: "exports",
+  },
 ];
 
 const datetimeFormat = "DD/MM/YY HH:mm:ss";
@@ -62,4 +74,28 @@ const localStorageKey = {
   msgInterval: "msg_interval",
 };
 
-export { menus, datetimeFormat, refreshItems, localStorageKey };
+const exportField = {
+  provider: ["_id", "name", "type", "token"],
+  server: [
+    "_id",
+    "server_name",
+    "server_id",
+    "type",
+    "provider_id",
+    "provider_name",
+  ],
+  channel: [
+    "_id",
+    "channel_name",
+    "channel_id",
+    "type",
+    "server_id",
+    "server_name",
+    "provider_id",
+    "provider_name",
+  ],
+  weight: ["_id", "value", "type"],
+  blacklist: ["_id", "value", "type", "weight"],
+};
+
+export { menus, datetimeFormat, refreshItems, localStorageKey, exportField };
