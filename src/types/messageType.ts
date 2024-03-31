@@ -26,9 +26,15 @@ type MessageFilterBy = {
   content?: string;
 };
 
+type MessageSortBy = {
+  server_id?: string;
+  author_username?: string;
+  received_at?: string;
+};
+
 type MessageRefreshInterval = {
   key: number;
   label: string;
 };
 
-export type { Message, MessageFilterBy, MessageRefreshInterval };
+export type { Message, MessageFilterBy, MessageRefreshInterval, MessageSortBy };

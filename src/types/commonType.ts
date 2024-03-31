@@ -32,6 +32,11 @@ type ExportOption = {
   fields: string[];
 };
 
+type FieldSortOrder = {
+  field: string;
+  order: string;
+};
+
 export type {
   PageContext,
   Response,
@@ -39,4 +44,5 @@ export type {
   DateRange,
   SelectLabelInValue,
   ExportOption,
+  FieldSortOrder,
 };

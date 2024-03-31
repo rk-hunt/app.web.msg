@@ -62,7 +62,13 @@ export default class BaseStore<TData> {
     };
   }
 
-  async onList(url: string, filterBy?: any, page = 1, isReturnData = false) {
+  async onList(
+    url: string,
+    filterBy?: any,
+    page = 1,
+    sortBy?: any,
+    isReturnData = false
+  ) {
     if (this.isFetching) {
       return;
     }
@@ -72,6 +78,7 @@ export default class BaseStore<TData> {
       params: {
         page,
         filter_by: filterBy ? JSON.stringify(filterBy) : undefined,
+        sort_by: sortBy ? JSON.stringify(sortBy) : undefined,
       },
     });
 

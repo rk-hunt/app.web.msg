@@ -27,6 +27,8 @@ import {
   refreshItems,
 } from "../../constants";
 import { Message, MessageFilterBy } from "../../types";
+import Markdown from "react-markdown";
+import { sortByBuilder } from "../../utils";
 
 const { Content } = Layout;
 const { RangePicker } = DatePicker;
@@ -40,25 +42,23 @@ const MessagePage: React.FC = () => {
     pageContext,
     highlightWeight,
     filterBy,
+    sortBy,
     refreshInterval,
   } = messageStore;
 
   const [form] = Form.useForm<any>();
-
-  const onPaginationChanged = useCallback(
-    (page: number, _: number) => {
-      messageStore.onList(MessageURL.list, filterBy, page);
-    },
-    [messageStore, filterBy]
-  );
 
   const onApplyFilter = useCallback(
     (values: MessageFilterBy) => {
       if (values.received_at) {
         const receivedAt = values.received_at as any;
         values.received_at = {
-          start: dayjs(receivedAt[0] as any).valueOf(),
-          end: dayjs(receivedAt[1] as any).valueOf(),
+          start: dayjs(receivedAt[0] as any)
+            .startOf("d")
+            .valueOf(),
+          end: dayjs(receivedAt[1] as any)
+            .endOf("d")
+            .valueOf(),
         };
       }
 
@@ -68,9 +68,9 @@ const MessagePage: React.FC = () => {
       };
 
       messageStore.setFilterBy(filter);
-      messageStore.onListMessages(MessageURL.list, filter);
+      messageStore.onListMessages(MessageURL.list, filter, sortBy);
     },
-    [messageStore]
+    [messageStore, sortBy]
   );
 
   const onSelectedRefreshInterval = useCallback(
@@ -87,6 +87,20 @@ const MessagePage: React.FC = () => {
     }
   }, [messageStore]);
 
+  const onChange = useCallback(
+    (pagination: any, _: any, sorter: any) => {
+      const sortBy = sortByBuilder(sorter);
+      messageStore.setSortBy(sortBy);
+      messageStore.onListMessages(
+        MessageURL.list,
+        filterBy,
+        sortBy,
+        pagination.current
+      );
+    },
+    [filterBy, messageStore]
+  );
+
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
       {
@@ -96,6 +110,9 @@ const MessagePage: React.FC = () => {
       {
         title: "Server",
         dataIndex: "server_name",
+        sorter: {
+          multiple: 1,
+        },
       },
       {
         title: "Channel",
@@ -104,10 +121,17 @@ const MessagePage: React.FC = () => {
       {
         title: "Author",
         dataIndex: "author_username",
+        sorter: {
+          multiple: 2,
+        },
       },
       {
         title: "Received At",
         dataIndex: "received_at",
+        defaultSortOrder: "descend",
+        sorter: {
+          multiple: 3,
+        },
         render: (value: number) => {
           return dayjs(value).format(datetimeFormat);
         },
@@ -118,7 +142,8 @@ const MessagePage: React.FC = () => {
         width: "30%",
         render: (_: string, message: Message) => {
           if (message.weight >= highlightWeight) {
-            return <span className="text-highlight">{message.content}</span>;
+            return <Markdown>{message.content}</Markdown>;
+            // <span className="text-highlight">
           }
           return message.content;
         },
@@ -228,8 +253,9 @@ const MessagePage: React.FC = () => {
                 total: pageContext.total,
                 showTotal: (total: number, range: any) =>
                   `${range[0]}-${range[1]} of ${total}`,
-                onChange: onPaginationChanged,
+                // onChange: onPaginationChanged,
               }}
+              onChange={onChange}
             />
           </Col>
         </Row>

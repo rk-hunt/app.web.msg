@@ -1,12 +1,18 @@
 import { action, makeObservable, observable } from "mobx";
 import { orderBy } from "lodash";
 import BaseStore from "./baseStore";
-import { Message, MessageFilterBy, MessageRefreshInterval } from "../types";
+import {
+  Message,
+  MessageFilterBy,
+  MessageRefreshInterval,
+  MessageSortBy,
+} from "../types";
 import AuthStore from "./authStore";
 import { MessageURL, localStorageKey, refreshItems } from "../constants";
 
 export default class MessageStore extends BaseStore<Message> {
   filterBy: MessageFilterBy = {};
+  sortBy: MessageSortBy = {};
   highlightWeight: number = 0;
   refreshInterval: MessageRefreshInterval = refreshItems[0];
   intervalId: number = 0;
@@ -17,8 +23,10 @@ export default class MessageStore extends BaseStore<Message> {
       refreshInterval: observable,
       intervalId: observable,
       filterBy: observable,
+      sortBy: observable,
       highlightWeight: observable,
       setFilterBy: action,
+      setSortBy: action,
       setHighlightWeight: action,
       onListMessages: action,
       onChangeRefreshInterval: action,
@@ -29,6 +37,10 @@ export default class MessageStore extends BaseStore<Message> {
 
   setFilterBy(val: any) {
     this.filterBy = val;
+  }
+
+  setSortBy(val: any) {
+    this.sortBy = val;
   }
 
   setHighlightWeight(val: any) {
@@ -44,8 +56,9 @@ export default class MessageStore extends BaseStore<Message> {
     this.intervalId = val;
   }
 
-  async onListMessages(url: string, filterBy?: any, page = 1) {
-    const messages = await super.onList(url, filterBy, page, true);
+  async onListMessages(url: string, filterBy?: any, sortBy?: any, page = 1) {
+    console.log("sort by in store: ", sortBy);
+    const messages = await super.onList(url, filterBy, page, sortBy, true);
 
     if (messages !== undefined && messages.length > 0) {
       const sortMessages = orderBy(messages, "weight", "desc");

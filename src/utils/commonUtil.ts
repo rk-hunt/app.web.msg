@@ -10,7 +10,7 @@ import {
   WeightURL,
   exportField,
 } from "../constants";
-import { ExportOption } from "../types";
+import { ExportOption, FieldSortOrder } from "../types";
 
 const exportToExcel = (
   data: any,
@@ -91,4 +91,19 @@ const getExportOption = (configuration: ImportExportConfig): ExportOption => {
   }
 };
 
-export { exportToExcel, getExportOption };
+const sortByBuilder = (sortColumns: FieldSortOrder[] | FieldSortOrder) => {
+  const sortBy: Record<string, any> = {};
+  if (typeof sortColumns === "object" && sortColumns.constructor === Object) {
+    sortBy[(sortColumns as FieldSortOrder).field] =
+      (sortColumns as FieldSortOrder).order === "ascend" ? "asc" : "desc";
+  } else {
+    for (const sort of sortColumns as FieldSortOrder[]) {
+      if (sort.order) {
+        sortBy[sort.field] = sort.order === "ascend" ? "asc" : "desc";
+      }
+    }
+  }
+  return sortBy;
+};
+
+export { exportToExcel, getExportOption, sortByBuilder };
