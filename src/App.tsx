@@ -34,6 +34,7 @@ const WeightPage = lazy(() => import("./pages/Weight/weightPage"));
 const UserPage = lazy(() => import("./pages/User/userPage"));
 const MessagePage = lazy(() => import("./pages/Message/messgePage"));
 const ExportPage = lazy(() => import("./pages/export/exportPage"));
+const ImportPage = lazy(() => import("./pages/import/importPage"));
 
 const { Sider } = Layout;
 const onGetIcons = (name: string): React.ReactNode => {
@@ -53,9 +54,9 @@ const onGetIcons = (name: string): React.ReactNode => {
     case "users":
       return <UserOutlined />;
     case "exports":
-      return <UploadOutlined />;
-    case "imports":
       return <DownloadOutlined />;
+    case "imports":
+      return <UploadOutlined />;
   }
 };
 
@@ -185,6 +186,14 @@ const App: React.FC = () => {
             element={
               <AuthRoute>
                 <UserPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/imports"
+            element={
+              <AuthRoute>
+                <ImportPage />
               </AuthRoute>
             }
           />

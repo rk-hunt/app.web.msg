@@ -1,3 +1,4 @@
+import { TableColumnsType } from "antd";
 import { MessageRefreshInterval } from "../types";
 
 const menus = [
@@ -98,4 +99,60 @@ const exportField = {
   blacklist: ["_id", "value", "type", "weight"],
 };
 
-export { menus, datetimeFormat, refreshItems, localStorageKey, exportField };
+const importFileType = {
+  csv: "text/csv",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+};
+
+const importServerColumns: TableColumnsType<any> = [
+  {
+    title: "Name",
+    dataIndex: "server_name",
+  },
+  {
+    title: "Server Id",
+    dataIndex: "server_id",
+  },
+  {
+    title: "Type",
+    dataIndex: "type",
+  },
+  {
+    title: "Provider",
+    dataIndex: "provider_name",
+  },
+];
+
+const importChannelColumns: TableColumnsType<any> = [
+  {
+    title: "Name",
+    dataIndex: "channel_name",
+  },
+  {
+    title: "Channel Id",
+    dataIndex: "channel_id",
+  },
+  {
+    title: "Type",
+    dataIndex: "type",
+  },
+  {
+    title: "Server",
+    dataIndex: "server_name",
+  },
+  {
+    title: "Provider",
+    dataIndex: "provider_name",
+  },
+];
+
+export {
+  menus,
+  datetimeFormat,
+  refreshItems,
+  localStorageKey,
+  exportField,
+  importFileType,
+  importServerColumns,
+  importChannelColumns,
+};

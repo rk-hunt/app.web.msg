@@ -232,18 +232,18 @@ const ProviderPage: React.FC = () => {
         <Form.Item
           label="Token"
           name="token"
-          rules={[{ required: true, message: "" }]}
+          rules={
+            actionType === ActionType.Create
+              ? [{ required: true, message: "" }]
+              : []
+          }
         >
           <Input placeholder="Token" />
         </Form.Item>
         <Form.Item label="API Id" name="api_id">
           <Input placeholder="API Id" />
         </Form.Item>
-        <Form.Item
-          label="API Hash"
-          name="api_hash"
-          rules={[{ required: true, message: "" }]}
-        >
+        <Form.Item label="API Hash" name="api_hash">
           <Input placeholder="Token" />
         </Form.Item>
       </SetupModal>

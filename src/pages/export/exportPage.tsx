@@ -11,7 +11,7 @@ import {
   Row,
   Select,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { DownloadOutlined } from "@ant-design/icons";
 import { Header, Page } from "../../components";
 import { ImportExportExtension, ImportExportConfig } from "../../constants";
 import useStores from "../../stores";
@@ -25,23 +25,20 @@ const ExportPage: React.FC = () => {
 
   const [form] = Form.useForm<any>();
 
-  const onExport = useCallback(
-    (values: any) => {
-      form
-        .validateFields()
-        .then((values: any) => {
-          const option = getExportOption(values.configuration);
-          baseStore.onExport(
-            option.url,
-            option.fields,
-            values.export_ext,
-            values.configuration
-          );
-        })
-        .catch((err) => {});
-    },
-    [form, baseStore]
-  );
+  const onExport = useCallback(() => {
+    form
+      .validateFields()
+      .then((values: any) => {
+        const option = getExportOption(values.configuration);
+        baseStore.onExport(
+          option.url,
+          option.fields,
+          values.export_ext,
+          values.configuration
+        );
+      })
+      .catch((err) => {});
+  }, [form, baseStore]);
 
   return (
     <Content>
@@ -116,7 +113,7 @@ const ExportPage: React.FC = () => {
                   <Flex justify="end">
                     <Button
                       type="primary"
-                      icon={<UploadOutlined />}
+                      icon={<DownloadOutlined />}
                       loading={isExporting}
                       onClick={onExport}
                     >
