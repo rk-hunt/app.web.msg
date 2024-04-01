@@ -110,9 +110,6 @@ const MessagePage: React.FC = () => {
       {
         title: "Server",
         dataIndex: "server_name",
-        sorter: {
-          multiple: 1,
-        },
       },
       {
         title: "Channel",
@@ -122,7 +119,7 @@ const MessagePage: React.FC = () => {
         title: "Author",
         dataIndex: "author_username",
         sorter: {
-          multiple: 2,
+          multiple: 1,
         },
       },
       {
@@ -130,7 +127,7 @@ const MessagePage: React.FC = () => {
         dataIndex: "received_at",
         defaultSortOrder: "descend",
         sorter: {
-          multiple: 3,
+          multiple: 2,
         },
         render: (value: number) => {
           return dayjs(value).format(datetimeFormat);

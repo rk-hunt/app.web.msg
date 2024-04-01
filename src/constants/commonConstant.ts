@@ -75,7 +75,7 @@ const localStorageKey = {
 };
 
 const exportField = {
-  provider: ["_id", "name", "type", "token"],
+  provider: ["_id", "name", "type", "token", "api_id", "api_hash"],
   server: [
     "_id",
     "server_name",

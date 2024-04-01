@@ -30,33 +30,19 @@ const { Content } = Layout;
 
 const ProviderPage: React.FC = () => {
   const { providerStore } = useStores();
-  const { data, isFetching, pageContext, isSaving, provider } = providerStore;
+  const { data, isFetching, pageContext, isSaving, provider, providerInfo } =
+    providerStore;
 
   const [visibleModal, setVisibleModal] = useState(false);
-  const [visibleSetupModal, setVisibleSetupModal] = useState(false);
   const [actionType, setActionType] = useState(ActionType.Create);
 
   const onOpenModal = useCallback(
-    (provider: Provider) => {
-      providerStore.setProvider(provider);
-      setActionType(ActionType.Set);
-      setVisibleModal(true);
+    (action: ActionType) => {
+      setActionType(action);
+      setVisibleModal(!visibleModal);
     },
-    [providerStore]
+    [visibleModal]
   );
-
-  const onCloseModal = useCallback(() => {
-    setVisibleModal(false);
-  }, []);
-
-  const onOpenSetupModal = useCallback(() => {
-    setActionType(ActionType.Create);
-    setVisibleSetupModal(true);
-  }, []);
-
-  const onCloseSetupModal = useCallback(() => {
-    setVisibleSetupModal(false);
-  }, []);
 
   const onPaginationChanged = useCallback(
     (page: number, _: number) => {
@@ -65,10 +51,22 @@ const ProviderPage: React.FC = () => {
     [providerStore]
   );
 
+  const onEdit = useCallback(
+    (info: Provider) => {
+      const providerInfo: ProviderInfo = {
+        name: info.name,
+        type: info.type,
+      };
+      providerStore.setProviderInfo(providerInfo);
+      onOpenModal(ActionType.Update);
+    },
+    [providerStore, onOpenModal]
+  );
+
   const onSaved = useCallback(
     (onReset: () => void) => {
       setVisibleModal(false);
-      setVisibleSetupModal(false);
+      setVisibleModal(false);
       providerStore.onList(ProviderURL.list);
       onReset();
     },
@@ -83,7 +81,7 @@ const ProviderPage: React.FC = () => {
           info,
           onSaved.bind(null, onReset)
         );
-      } else if (actionType === ActionType.Set) {
+      } else if (actionType === ActionType.Update) {
         providerStore.onUpdate(
           `${ProviderURL.base}/${provider._id}`,
           info,
@@ -137,7 +135,7 @@ const ProviderPage: React.FC = () => {
             <Button
               icon={<EditOutlined />}
               size="small"
-              onClick={onOpenModal.bind(null, provider)}
+              onClick={onEdit.bind(null, provider)}
             />
           );
         },
@@ -145,7 +143,7 @@ const ProviderPage: React.FC = () => {
     ];
 
     return columns;
-  }, [onOpenModal]);
+  }, [onEdit]);
 
   useEffect(() => {
     providerStore.onList(ProviderURL.list);
@@ -164,7 +162,7 @@ const ProviderPage: React.FC = () => {
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                onClick={onOpenSetupModal}
+                onClick={onOpenModal.bind(null, ActionType.Create)}
               >
                 New Provider
               </Button>
@@ -192,29 +190,17 @@ const ProviderPage: React.FC = () => {
         </Row>
       </Page>
 
-      {/* set|unset token */}
       <SetupModal
-        title="Set Token"
+        title={
+          actionType === ActionType.Create
+            ? "New Provider"
+            : `Edit Provider ${providerInfo.name}`
+        }
         visible={visibleModal}
         isSaving={isSaving}
-        onCancel={onCloseModal}
-        onSave={onSave}
-      >
-        <Form.Item
-          label="Token"
-          name="token"
-          rules={[{ required: true, message: "" }]}
-        >
-          <Input placeholder="Token" />
-        </Form.Item>
-      </SetupModal>
-
-      {/* create provider modal */}
-      <SetupModal
-        title="New Provider"
-        visible={visibleSetupModal}
-        isSaving={isSaving}
-        onCancel={onCloseSetupModal}
+        actionType={actionType}
+        data={providerInfo}
+        onCancel={onOpenModal.bind(null, ActionType.Create)}
         onSave={onSave}
       >
         <Form.Item
@@ -246,6 +232,16 @@ const ProviderPage: React.FC = () => {
         <Form.Item
           label="Token"
           name="token"
+          rules={[{ required: true, message: "" }]}
+        >
+          <Input placeholder="Token" />
+        </Form.Item>
+        <Form.Item label="API Id" name="api_id">
+          <Input placeholder="API Id" />
+        </Form.Item>
+        <Form.Item
+          label="API Hash"
+          name="api_hash"
           rules={[{ required: true, message: "" }]}
         >
           <Input placeholder="Token" />

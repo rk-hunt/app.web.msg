@@ -10,12 +10,20 @@ type Provider = {
   name: string;
   type: ProviderType;
   token: string;
+  config?: {
+    app_id: string;
+    app_hash: string;
+  };
   created_at: number;
   updated_at: number;
 };
 
 type ProviderInfo = {
-  token: string;
+  name: string;
+  type: ProviderType;
+  token?: string;
+  app_id?: string;
+  app_hash?: string;
 };
 
 type Server = {

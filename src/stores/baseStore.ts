@@ -1,6 +1,10 @@
 import { observable, action, makeObservable } from "mobx";
 import { PageContext, Response, ResponseList } from "../types";
-import { HttpCode, ImportExportExtension } from "../constants";
+import {
+  HttpCode,
+  ImportExportConfig,
+  ImportExportExtension,
+} from "../constants";
 import AuthStore from "./authStore";
 import {
   exportToExcel,
@@ -174,7 +178,14 @@ export default class BaseStore<TData> {
         for (const expData of exportData) {
           const exportDoc: Record<string, any> = {};
           for (const exportField of exportFields) {
-            exportDoc[exportField] = expData[exportField];
+            if (
+              filename === ImportExportConfig.Providers &&
+              ["api_id", "api_hash"].includes(exportField)
+            ) {
+              exportDoc[exportField] = expData.config[exportField];
+            } else {
+              exportDoc[exportField] = expData[exportField];
+            }
           }
           exportDocs.push(exportDoc);
         }
