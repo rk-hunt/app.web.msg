@@ -104,47 +104,44 @@ const importFileType = {
   xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 };
 
+const importProviderColumns: TableColumnsType<any> = [
+  { title: "Name", dataIndex: "name" },
+  { title: "Type", dataIndex: "type" },
+  { title: "Token", dataIndex: "token" },
+  { title: "Api Id", dataIndex: "api_id" },
+  { title: "Api Hash", dataIndex: "api_hash" },
+];
+
 const importServerColumns: TableColumnsType<any> = [
-  {
-    title: "Name",
-    dataIndex: "server_name",
-  },
-  {
-    title: "Server Id",
-    dataIndex: "server_id",
-  },
-  {
-    title: "Type",
-    dataIndex: "type",
-  },
-  {
-    title: "Provider",
-    dataIndex: "provider_name",
-  },
+  { title: "Name", dataIndex: "server_name" },
+  { title: "Server Id", dataIndex: "server_id" },
+  { title: "Type", dataIndex: "type" },
+  { title: "Provider Id", dataIndex: "provider_id" },
+  { title: "Provider", dataIndex: "provider_name" },
 ];
 
 const importChannelColumns: TableColumnsType<any> = [
-  {
-    title: "Name",
-    dataIndex: "channel_name",
-  },
-  {
-    title: "Channel Id",
-    dataIndex: "channel_id",
-  },
-  {
-    title: "Type",
-    dataIndex: "type",
-  },
-  {
-    title: "Server",
-    dataIndex: "server_name",
-  },
-  {
-    title: "Provider",
-    dataIndex: "provider_name",
-  },
+  { title: "Name", dataIndex: "channel_name" },
+  { title: "Channel Id", dataIndex: "channel_id" },
+  { title: "Type", dataIndex: "type" },
+  { title: "Server Id", dataIndex: "server_id" },
+  { title: "Server", dataIndex: "server_name" },
+  { title: "Provider Id", dataIndex: "provider_id" },
+  { title: "Provider", dataIndex: "provider_name" },
 ];
+
+const importWeightColumns: TableColumnsType<any> = [
+  { title: "Value", dataIndex: "value" },
+  { title: "Type", dataIndex: "type" },
+  { title: "Weight", dataIndex: "weight" },
+];
+
+const importBlacklistColumns: TableColumnsType<any> = [
+  { title: "Value", dataIndex: "value" },
+  { title: "Type", dataIndex: "type" },
+];
+
+const numberImportPerRequest = 25;
 
 export {
   menus,
@@ -153,6 +150,10 @@ export {
   localStorageKey,
   exportField,
   importFileType,
+  importProviderColumns,
   importServerColumns,
   importChannelColumns,
+  importWeightColumns,
+  importBlacklistColumns,
+  numberImportPerRequest,
 };

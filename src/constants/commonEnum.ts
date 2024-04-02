@@ -63,6 +63,14 @@ enum ImportExportExtension {
   xlsx = "xlsx",
 }
 
+enum ImportStatus {
+  Invalid = "Invalid",
+  Valid = "Valid",
+  Importing = "Importing",
+  Imported = "Imported",
+  Error = "Error",
+}
+
 export {
   HttpCode,
   WeightType,
@@ -74,4 +82,5 @@ export {
   ActionType,
   ImportExportConfig,
   ImportExportExtension,
+  ImportStatus,
 };

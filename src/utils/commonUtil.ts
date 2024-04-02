@@ -106,4 +106,18 @@ const sortByBuilder = (sortColumns: FieldSortOrder[] | FieldSortOrder) => {
   return sortBy;
 };
 
-export { exportToExcel, getExportOption, sortByBuilder };
+const objectValueValidator = (
+  objectData: Record<string, any>,
+  fields: string[]
+): boolean => {
+  for (const f of fields) {
+    const value = objectData[f];
+    if (!value || value === undefined || value === null) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+export { exportToExcel, getExportOption, sortByBuilder, objectValueValidator };

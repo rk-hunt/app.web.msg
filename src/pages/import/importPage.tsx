@@ -22,30 +22,42 @@ import {
   importFileType,
   importServerColumns,
   importChannelColumns,
+  importProviderColumns,
+  importWeightColumns,
+  importBlacklistColumns,
 } from "../../constants";
+import useStores from "../../stores";
 
 const { Content } = Layout;
 
 const ImportPage: React.FC = () => {
+  const { baseStore } = useStores();
+  const { isImporting, importData } = baseStore;
+
   const [form] = Form.useForm<any>();
   const [configuration, setConfiguration] = useState(
     ImportExportConfig.Providers
   );
-  const [importData, setImportData] = useState<any>([]);
 
   const onSelectConfiguration = useCallback((value: any) => {
     setConfiguration(value);
-    setImportData([]);
-  }, []);
+    baseStore.setImportData([]);
+  }, [baseStore]);
 
   const tableColumns = useMemo(() => {
     switch (configuration) {
+      case ImportExportConfig.Providers:
+        return importProviderColumns;
       case ImportExportConfig.Servers:
         return importServerColumns;
       case ImportExportConfig.Channels:
         return importChannelColumns;
+      case ImportExportConfig.Weights:
+        return importWeightColumns;
+      case ImportExportConfig.Blacklist:
+        return importBlacklistColumns;
       default:
-        return importServerColumns;
+        return [];
     }
   }, [configuration]);
 
@@ -63,11 +75,11 @@ const ImportPage: React.FC = () => {
       const sheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 0 });
       console.log("jsonData: ", jsonData);
-      setImportData(jsonData);
+      baseStore.setImportData(jsonData);
     };
     reader.readAsArrayBuffer(file);
     return false;
-  }, []);
+  }, [baseStore]);
 
   return (
     <Content>
@@ -136,7 +148,8 @@ const ImportPage: React.FC = () => {
                     <Button
                       type="primary"
                       icon={<DownloadOutlined />}
-                      loading={false}
+                      loading={isImporting}
+                      disabled={importData.length <= 0}
                       style={{ marginTop: 30 }}
                     >
                       Import

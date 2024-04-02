@@ -20,6 +20,8 @@ export default class BaseStore<TData> {
   isFetching = false;
   isSaving = false;
   isExporting = false;
+  isImporting = false;
+  importData: any[] = [];
   data: TData[] = [];
   pageContext: PageContext = {
     current_page: 1,
@@ -34,6 +36,9 @@ export default class BaseStore<TData> {
       isFetching: observable,
       isSaving: observable,
       setIsFetching: observable,
+      isExporting: observable,
+      isImporting: observable,
+      importData: observable,
       data: observable,
       pageContext: observable,
       setData: action,
@@ -53,6 +58,12 @@ export default class BaseStore<TData> {
   }
   setIsExporting(val: boolean) {
     this.isExporting = val;
+  }
+  setIsImporting(val: boolean) {
+    this.isImporting = val;
+  }
+  setImportData(val: any[]) {
+    this.importData = val;
   }
   setData(val: TData[]) {
     this.data = val;
@@ -146,7 +157,7 @@ export default class BaseStore<TData> {
     this.authStore.onCheckAuth(status, data.message);
     return false;
   }
-
+  
   async onExport(
     url: string,
     exportFields: string[],
