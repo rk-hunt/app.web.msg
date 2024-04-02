@@ -11,6 +11,7 @@ import {
   ServerReqInfo,
 } from "../types";
 import {
+  ImportExportConfig,
   ImportStatus,
   ProviderServerType,
   ProviderType,
@@ -67,7 +68,7 @@ export default class ServerStore extends BaseStore<Server> {
     this.filterBy = val;
   }
 
-  async onImport(importData: ServerImportInfo[]) {
+  onImportServer(importData: ServerImportInfo[]) {
     this.setIsImporting(true);
     const serverReqInfo: ServerReqInfo[] = [];
     const ServerImportInfo: ServerImportInfo[] = [];
@@ -96,52 +97,11 @@ export default class ServerStore extends BaseStore<Server> {
       this.setIsImporting(true);
       return;
     }
-    // send chucking request
-    const totalRequest = serverReqInfo.length / numberImportPerRequest;
-    for (let i = 1; i < totalRequest; i += numberImportPerRequest) {
-      const chuckServerReqInfo = serverReqInfo.slice(
-        i - 1,
-        numberImportPerRequest * i
-      );
 
-      const { status, data } = await httpPost(`${ServerURL.base}/import`, {
-        servers: chuckServerReqInfo,
-      });
-
-      if (
-        status === HttpStatusCode.Ok ||
-        status === HttpStatusCode.InternalServerError
-      ) {
-        for (const reqInfo of chuckServerReqInfo) {
-          const updatedServerImportData = ServerImportInfo.map((serverInfo) => {
-            if (serverInfo._id === reqInfo._id) {
-              if (status === HttpStatusCode.Ok) {
-                serverInfo.status = ImportStatus.Imported;
-              } else {
-                serverInfo.status = ImportStatus.Error;
-                serverInfo.message = "Internal server error";
-              }
-            }
-            return serverInfo;
-          });
-          this.setImportData(updatedServerImportData);
-        }
-      } else {
-        for (const reqInfo of chuckServerReqInfo) {
-          const errorInfo = data.payload.data.find(
-            (resData: any) => resData._id === reqInfo._id
-          );
-          const updatedServerImportData = ServerImportInfo.map((serverInfo) => {
-            if (serverInfo._id === reqInfo._id) {
-              serverInfo.status = ImportStatus.Error;
-              serverInfo.message = errorInfo.message || null;
-            }
-            return serverInfo;
-          });
-          this.setImportData(updatedServerImportData);
-        }
-      }
-    }
-    this.setIsImporting(false);
+    super.onImport(
+      ServerImportInfo,
+      `${ServerURL.base}/import`,
+      ImportExportConfig.Servers.toLocaleLowerCase()
+    );
   }
 }

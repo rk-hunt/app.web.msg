@@ -4,6 +4,8 @@ import {
   HttpCode,
   ImportExportConfig,
   ImportExportExtension,
+  ImportStatus,
+  numberImportPerRequest,
 } from "../constants";
 import AuthStore from "./authStore";
 import {
@@ -14,6 +16,7 @@ import {
   httpPut,
 } from "../utils";
 import message from "../utils/message";
+import { HttpStatusCode } from "axios";
 
 export default class BaseStore<TData> {
   authStore: AuthStore;
@@ -157,7 +160,7 @@ export default class BaseStore<TData> {
     this.authStore.onCheckAuth(status, data.message);
     return false;
   }
-  
+
   async onExport(
     url: string,
     exportFields: string[],
@@ -210,6 +213,51 @@ export default class BaseStore<TData> {
       return;
     }
     this.authStore.onCheckAuth(status, data.message);
+  }
+
+  async onImport(dataReqInfo: any[], url: string, configuration: string) {
+    const totalRequest = dataReqInfo.length / numberImportPerRequest;
+    for (let i = 1; i < totalRequest; i += numberImportPerRequest) {
+      const chuckReqInfo = dataReqInfo.slice(i - 1, numberImportPerRequest * i);
+      const { status, data } = await httpPost(url, {
+        [configuration]: chuckReqInfo,
+      });
+
+      if (
+        status === HttpStatusCode.Ok ||
+        status === HttpStatusCode.InternalServerError
+      ) {
+        for (const reqInfo of chuckReqInfo) {
+          const updatedImportData = this.importData.map((impData) => {
+            if (impData._id === reqInfo._id) {
+              if (status === HttpStatusCode.Ok) {
+                impData.status = ImportStatus.Imported;
+              } else {
+                impData.status = ImportStatus.Error;
+                impData.message = "Internal server error";
+              }
+            }
+            return impData;
+          });
+          this.setImportData(updatedImportData);
+        }
+      } else {
+        for (const reqInfo of chuckReqInfo) {
+          const errorInfo = data.payload.data.find(
+            (resData: any) => resData._id === reqInfo._id
+          );
+          const updatedImportData = this.importData.map((impData) => {
+            if (impData._id === reqInfo._id) {
+              impData.status = ImportStatus.Error;
+              impData.message = errorInfo.message || null;
+            }
+            return impData;
+          });
+          this.setImportData(updatedImportData);
+        }
+      }
+    }
+    this.setIsImporting(false);
   }
 
   onReset(): void {

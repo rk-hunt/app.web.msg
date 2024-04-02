@@ -31,7 +31,7 @@ import useStores from "../../stores";
 const { Content } = Layout;
 
 const ImportPage: React.FC = () => {
-  const { baseStore } = useStores();
+  const { baseStore, serverStore } = useStores();
   const { isImporting, importData } = baseStore;
 
   const [form] = Form.useForm<any>();
@@ -39,10 +39,13 @@ const ImportPage: React.FC = () => {
     ImportExportConfig.Providers
   );
 
-  const onSelectConfiguration = useCallback((value: any) => {
-    setConfiguration(value);
-    baseStore.setImportData([]);
-  }, [baseStore]);
+  const onSelectConfiguration = useCallback(
+    (value: any) => {
+      setConfiguration(value);
+      baseStore.setImportData([]);
+    },
+    [baseStore]
+  );
 
   const tableColumns = useMemo(() => {
     switch (configuration) {
@@ -61,25 +64,40 @@ const ImportPage: React.FC = () => {
     }
   }, [configuration]);
 
-  const beforeUpload = useCallback((file: File) => {
-    if (![importFileType.csv, importFileType.xlsx].includes(file.type)) {
-      message.error(`${file.name} is not support file`);
-      return false;
-    }
+  const beforeUpload = useCallback(
+    (file: File) => {
+      if (![importFileType.csv, importFileType.xlsx].includes(file.type)) {
+        message.error(`${file.name} is not support file`);
+        return false;
+      }
 
-    const reader = new FileReader();
-    reader.onload = (event: ProgressEvent<FileReader>) => {
-      const data = new Uint8Array(event.target?.result as any);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 0 });
-      console.log("jsonData: ", jsonData);
-      baseStore.setImportData(jsonData);
-    };
-    reader.readAsArrayBuffer(file);
-    return false;
-  }, [baseStore]);
+      const reader = new FileReader();
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const data = new Uint8Array(event.target?.result as any);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 0 });
+        console.log("jsonData: ", jsonData);
+        baseStore.setImportData(jsonData);
+      };
+      reader.readAsArrayBuffer(file);
+      return false;
+    },
+    [baseStore]
+  );
+
+  const onImport = useCallback(() => {
+    switch (configuration) {
+      case ImportExportConfig.Providers:
+        break;
+      case ImportExportConfig.Servers:
+        serverStore.onImportServer(importData);
+        break;
+      default:
+        break;
+    }
+  }, [configuration, importData, serverStore]);
 
   return (
     <Content>
@@ -151,6 +169,7 @@ const ImportPage: React.FC = () => {
                       loading={isImporting}
                       disabled={importData.length <= 0}
                       style={{ marginTop: 30 }}
+                      onClick={onImport}
                     >
                       Import
                     </Button>
