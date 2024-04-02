@@ -1,4 +1,4 @@
-import { ImportStatus, ProviderServerType } from "../constants";
+import { ProviderServerType } from "../constants";
 import { SelectLabelInValue } from "./commonType";
 
 type Server = {
@@ -34,21 +34,4 @@ type ServerReqInfo = {
   server_name: string;
 };
 
-type ServerImportInfo ={
-  _id?: string;
-  provider_id: string;
-  provider_name: string;
-  type: ProviderServerType;
-  server_id: string;
-  server_name: string;
-  status?: ImportStatus;
-  message?: string;
-};
-
-export type {
-  Server,
-  ServerFilterBy,
-  ServerInfo,
-  ServerReqInfo,
-  ServerImportInfo,
-};
+export type { Server, ServerFilterBy, ServerInfo, ServerReqInfo };

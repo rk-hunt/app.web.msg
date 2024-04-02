@@ -95,8 +95,8 @@ const exportField = {
     "provider_id",
     "provider_name",
   ],
-  weight: ["_id", "value", "type"],
-  blacklist: ["_id", "value", "type", "weight"],
+  weight: ["_id", "value", "type", "weight"],
+  blacklist: ["_id", "value", "type"],
 };
 
 const importFileType = {
@@ -107,9 +107,9 @@ const importFileType = {
 const importProviderColumns: TableColumnsType<any> = [
   { title: "Name", dataIndex: "name" },
   { title: "Type", dataIndex: "type" },
-  { title: "Token", dataIndex: "token" },
-  { title: "Api Id", dataIndex: "api_id" },
-  { title: "Api Hash", dataIndex: "api_hash" },
+  { title: "Token", dataIndex: "token", ellipsis: true },
+  { title: "API Id", dataIndex: "api_id" },
+  { title: "API Hash", dataIndex: "api_hash", ellipsis: true },
 ];
 
 const importServerColumns: TableColumnsType<any> = [
@@ -142,6 +142,8 @@ const importBlacklistColumns: TableColumnsType<any> = [
 ];
 
 const numberImportPerRequest = 25;
+const numberFields = ["weight"];
+const importOptionalFields = ["api_id", "api_hash"];
 
 export {
   menus,
@@ -156,4 +158,6 @@ export {
   importWeightColumns,
   importBlacklistColumns,
   numberImportPerRequest,
+  numberFields,
+  importOptionalFields,
 };

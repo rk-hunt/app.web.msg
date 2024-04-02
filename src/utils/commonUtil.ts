@@ -108,12 +108,15 @@ const sortByBuilder = (sortColumns: FieldSortOrder[] | FieldSortOrder) => {
 
 const objectValueValidator = (
   objectData: Record<string, any>,
-  fields: string[]
+  fields: string[],
+  optionFields: string[]
 ): boolean => {
   for (const f of fields) {
     const value = objectData[f];
-    if (!value || value === undefined || value === null) {
-      return false;
+    if (!optionFields.includes(f)) {
+      if (value === undefined || value === null) {
+        return false;
+      }
     }
   }
 

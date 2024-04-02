@@ -11,6 +11,8 @@ import {
   Row,
   Select,
   Table,
+  TableColumnsType,
+  Tag,
   Upload,
   message,
 } from "antd";
@@ -25,14 +27,21 @@ import {
   importProviderColumns,
   importWeightColumns,
   importBlacklistColumns,
+  ImportStatus,
+  ServerURL,
+  exportField,
+  ChannelURL,
+  WeightURL,
+  BlacklistURL,
+  ProviderURL,
 } from "../../constants";
 import useStores from "../../stores";
 
 const { Content } = Layout;
 
 const ImportPage: React.FC = () => {
-  const { baseStore, serverStore } = useStores();
-  const { isImporting, importData } = baseStore;
+  const { baseStore } = useStores();
+  const { isImporting, getImportData } = baseStore;
 
   const [form] = Form.useForm<any>();
   const [configuration, setConfiguration] = useState(
@@ -48,20 +57,53 @@ const ImportPage: React.FC = () => {
   );
 
   const tableColumns = useMemo(() => {
+    let cols: TableColumnsType<any> = [];
     switch (configuration) {
       case ImportExportConfig.Providers:
-        return importProviderColumns;
+        cols = importProviderColumns;
+        break;
       case ImportExportConfig.Servers:
-        return importServerColumns;
+        cols = importServerColumns;
+        break;
       case ImportExportConfig.Channels:
-        return importChannelColumns;
+        cols = importChannelColumns;
+        break;
       case ImportExportConfig.Weights:
-        return importWeightColumns;
+        cols = importWeightColumns;
+        break;
       case ImportExportConfig.Blacklist:
-        return importBlacklistColumns;
+        cols = importBlacklistColumns;
+        break;
       default:
-        return [];
+        cols = [];
     }
+
+    const columns = cols.concat([
+      {
+        title: "Status",
+        dataIndex: "status",
+        render: (value: any) => {
+          if (value !== undefined) {
+            return (
+              <Tag
+                color={
+                  value === ImportStatus.Valid ||
+                  value === ImportStatus.Imported
+                    ? "success"
+                    : "error"
+                }
+              >
+                {value}
+              </Tag>
+            );
+          }
+          return <></>;
+        },
+      },
+      { title: "Message", dataIndex: "message" },
+    ]);
+
+    return columns;
   }, [configuration]);
 
   const beforeUpload = useCallback(
@@ -88,16 +130,28 @@ const ImportPage: React.FC = () => {
   );
 
   const onImport = useCallback(() => {
-    switch (configuration) {
-      case ImportExportConfig.Providers:
-        break;
-      case ImportExportConfig.Servers:
-        serverStore.onImportServer(importData);
-        break;
-      default:
-        break;
+    let url: string = "";
+    let fields: string[] = [];
+
+    if (configuration === ImportExportConfig.Providers) {
+      url = `${ProviderURL.base}/import`;
+      fields = exportField.provider;
+    } else if (configuration === ImportExportConfig.Servers) {
+      url = `${ServerURL.base}/import`;
+      fields = exportField.server;
+    } else if (configuration === ImportExportConfig.Channels) {
+      url = `${ChannelURL.base}/import`;
+      fields = exportField.channel;
+    } else if (configuration === ImportExportConfig.Weights) {
+      url = `${WeightURL.base}/import`;
+      fields = exportField.weight;
+    } else if (configuration === ImportExportConfig.Blacklist) {
+      url = `${BlacklistURL.base}/import`;
+      fields = exportField.blacklist;
     }
-  }, [configuration, importData, serverStore]);
+
+    baseStore.onImport(url, configuration, fields);
+  }, [configuration, baseStore]);
 
   return (
     <Content>
@@ -167,7 +221,7 @@ const ImportPage: React.FC = () => {
                       type="primary"
                       icon={<DownloadOutlined />}
                       loading={isImporting}
-                      disabled={importData.length <= 0}
+                      disabled={getImportData.length <= 0}
                       style={{ marginTop: 30 }}
                       onClick={onImport}
                     >
@@ -182,7 +236,7 @@ const ImportPage: React.FC = () => {
             <Table
               rowKey="_id"
               columns={tableColumns}
-              dataSource={importData}
+              dataSource={getImportData}
               pagination={false}
             />
           </Col>

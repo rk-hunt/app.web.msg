@@ -1,10 +1,12 @@
-import { observable, action, makeObservable } from "mobx";
+import { observable, action, makeObservable, toJS, computed } from "mobx";
 import { PageContext, Response, ResponseList } from "../types";
 import {
   HttpCode,
   ImportExportConfig,
   ImportExportExtension,
   ImportStatus,
+  importOptionalFields,
+  numberFields,
   numberImportPerRequest,
 } from "../constants";
 import AuthStore from "./authStore";
@@ -14,6 +16,7 @@ import {
   httpGet,
   httpPost,
   httpPut,
+  objectValueValidator,
 } from "../utils";
 import message from "../utils/message";
 import { HttpStatusCode } from "axios";
@@ -47,9 +50,12 @@ export default class BaseStore<TData> {
       setData: action,
       setIsSaving: action,
       setIsExporting: action,
+      setIsImporting: action,
+      setImportData: action,
       setPageContext: action,
       onList: action,
       onExport: action,
+      getImportData: computed,
     });
   }
 
@@ -196,7 +202,9 @@ export default class BaseStore<TData> {
               filename === ImportExportConfig.Providers &&
               ["api_id", "api_hash"].includes(exportField)
             ) {
-              exportDoc[exportField] = expData.config[exportField];
+              exportDoc[exportField] = expData.config
+                ? expData.config[exportField]
+                : null;
             } else {
               exportDoc[exportField] = expData[exportField];
             }
@@ -215,12 +223,52 @@ export default class BaseStore<TData> {
     this.authStore.onCheckAuth(status, data.message);
   }
 
-  async onImport(dataReqInfo: any[], url: string, configuration: string) {
-    const totalRequest = dataReqInfo.length / numberImportPerRequest;
-    for (let i = 1; i < totalRequest; i += numberImportPerRequest) {
-      const chuckReqInfo = dataReqInfo.slice(i - 1, numberImportPerRequest * i);
+  async onImport(url: string, configuration: string, fields: string[]) {
+    this.setIsImporting(true);
+    const reqInfo: any[] = [];
+    const importInfo: any[] = [];
+    let invalidCount = 0;
+
+    for (const data of this.getImportData) {
+      const validated = objectValueValidator(
+        data,
+        fields,
+        importOptionalFields
+      );
+      console.log("validated: ", validated);
+      if (validated === false) {
+        invalidCount += 1;
+        data.status = ImportStatus.Invalid;
+      } else {
+        data.status = ImportStatus.Valid;
+      }
+
+      importInfo.push(data);
+      const info: Record<string, any> = {};
+      for (const field of fields) {
+        if (numberFields.includes(field)) {
+          info[field] = parseFloat(data[field]);
+        } else {
+          info[field] = data[field]?.toString();
+        }
+      }
+      reqInfo.push(info);
+    }
+
+    this.setImportData(importInfo);
+    if (invalidCount > 0) {
+      this.setIsImporting(false);
+      return;
+    }
+
+    const totalRequest = Math.ceil(reqInfo.length / numberImportPerRequest);
+    for (let i = 1; i <= totalRequest; i++) {
+      const start = i - 1;
+      const end = numberImportPerRequest * i;
+      const chuckReqInfo = reqInfo.slice(start * numberImportPerRequest, end);
+
       const { status, data } = await httpPost(url, {
-        [configuration]: chuckReqInfo,
+        [configuration.toLowerCase()]: chuckReqInfo,
       });
 
       if (
@@ -228,10 +276,11 @@ export default class BaseStore<TData> {
         status === HttpStatusCode.InternalServerError
       ) {
         for (const reqInfo of chuckReqInfo) {
-          const updatedImportData = this.importData.map((impData) => {
+          const updatedImportData = this.getImportData.map((impData) => {
             if (impData._id === reqInfo._id) {
               if (status === HttpStatusCode.Ok) {
                 impData.status = ImportStatus.Imported;
+                impData.message = null;
               } else {
                 impData.status = ImportStatus.Error;
                 impData.message = "Internal server error";
@@ -242,18 +291,20 @@ export default class BaseStore<TData> {
           this.setImportData(updatedImportData);
         }
       } else {
-        for (const reqInfo of chuckReqInfo) {
-          const errorInfo = data.payload.data.find(
-            (resData: any) => resData._id === reqInfo._id
-          );
-          const updatedImportData = this.importData.map((impData) => {
-            if (impData._id === reqInfo._id) {
-              impData.status = ImportStatus.Error;
-              impData.message = errorInfo.message || null;
-            }
-            return impData;
-          });
-          this.setImportData(updatedImportData);
+        if (status === HttpStatusCode.BadRequest) {
+          for (const reqInfo of chuckReqInfo) {
+            const errorInfo = data.payload.find(
+              (resData: any) => resData._id === reqInfo._id
+            );
+            const updatedImportData = this.getImportData.map((impData) => {
+              if (impData._id === reqInfo._id && errorInfo) {
+                impData.status = ImportStatus.Error;
+                impData.message = errorInfo.message;
+              }
+              return impData;
+            });
+            this.setImportData(updatedImportData);
+          }
         }
       }
     }
@@ -264,6 +315,12 @@ export default class BaseStore<TData> {
     this.setIsFetching(false);
     this.setIsSaving(false);
     this.setIsExporting(false);
+    this.setIsImporting(false);
     this.setData([]);
+    this.setImportData([]);
+  }
+
+  get getImportData() {
+    return toJS(this.importData);
   }
 }

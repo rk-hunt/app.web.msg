@@ -54,7 +54,7 @@ enum ImportExportConfig {
   Providers = "Providers",
   Servers = "Servers",
   Channels = "Channels",
-  Blacklist = "Blacklist",
+  Blacklist = "Blacklists",
   Weights = "Weights",
 }
 

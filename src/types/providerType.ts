@@ -14,6 +14,7 @@ type Provider = {
 };
 
 type ProviderInfo = {
+  _id?: string;
   name: string;
   type: ProviderType;
   token?: string;

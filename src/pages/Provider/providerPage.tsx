@@ -30,7 +30,7 @@ const { Content } = Layout;
 
 const ProviderPage: React.FC = () => {
   const { providerStore } = useStores();
-  const { data, isFetching, pageContext, isSaving, provider, providerInfo } =
+  const { data, isFetching, pageContext, isSaving, providerInfo } =
     providerStore;
 
   const [visibleModal, setVisibleModal] = useState(false);
@@ -54,6 +54,7 @@ const ProviderPage: React.FC = () => {
   const onEdit = useCallback(
     (info: Provider) => {
       const providerInfo: ProviderInfo = {
+        _id: info._id,
         name: info.name,
         type: info.type,
       };
@@ -83,13 +84,13 @@ const ProviderPage: React.FC = () => {
         );
       } else if (actionType === ActionType.Update) {
         providerStore.onUpdate(
-          `${ProviderURL.base}/${provider._id}`,
+          `${ProviderURL.base}/${providerInfo._id}`,
           info,
           onSaved.bind(null, onReset)
         );
       }
     },
-    [providerStore, provider, actionType, onSaved]
+    [providerStore, providerInfo, actionType, onSaved]
   );
 
   const tableColumns = useMemo(() => {
