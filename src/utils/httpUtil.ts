@@ -4,6 +4,7 @@ interface Data {
   code?: number;
   message?: string;
   payload?: any;
+  errors?: any[];
 }
 
 interface HttpResponse<T> {

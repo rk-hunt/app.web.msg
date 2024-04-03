@@ -206,7 +206,11 @@ export default class BaseStore<TData> {
                 ? expData.config[exportField]
                 : null;
             } else {
-              exportDoc[exportField] = expData[exportField];
+              if (numberFields.includes(exportField)) {
+                exportDoc[exportField] = expData[exportField];
+              } else {
+                exportDoc[exportField] = expData[exportField];
+              }
             }
           }
           exportDocs.push(exportDoc);
@@ -289,9 +293,10 @@ export default class BaseStore<TData> {
             return impData;
           });
           this.setImportData(updatedImportData);
+          this.setIsImporting(false);
         }
       } else {
-        if (status === HttpStatusCode.BadRequest) {
+        if (status === HttpStatusCode.BadRequest && !data.errors) {
           for (const reqInfo of chuckReqInfo) {
             const errorInfo = data.payload.find(
               (resData: any) => resData._id === reqInfo._id
@@ -304,7 +309,10 @@ export default class BaseStore<TData> {
               return impData;
             });
             this.setImportData(updatedImportData);
+            this.setIsImporting(false);
           }
+        } else {
+          message.error(data.message as any);
         }
       }
     }

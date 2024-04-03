@@ -142,7 +142,7 @@ const importBlacklistColumns: TableColumnsType<any> = [
 ];
 
 const numberImportPerRequest = 25;
-const numberFields = ["weight"];
+const numberFields = ["weight", "api_id"];
 const importOptionalFields = ["api_id", "api_hash"];
 
 export {

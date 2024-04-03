@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 import * as XLSX from "xlsx";
 import {
@@ -115,11 +115,11 @@ const ImportPage: React.FC = () => {
 
       const reader = new FileReader();
       reader.onload = (event: ProgressEvent<FileReader>) => {
-        const data = new Uint8Array(event.target?.result as any);
-        const workbook = XLSX.read(data, { type: "array" });
+        const bstr = event.target?.result;
+        const workbook = XLSX.read(bstr, { type: "binary", raw: true });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 0 });
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
         console.log("jsonData: ", jsonData);
         baseStore.setImportData(jsonData);
       };
@@ -152,6 +152,12 @@ const ImportPage: React.FC = () => {
 
     baseStore.onImport(url, configuration, fields);
   }, [configuration, baseStore]);
+
+  useEffect(() => {
+    return () => {
+      baseStore.onReset();
+    };
+  }, [baseStore]);
 
   return (
     <Content>

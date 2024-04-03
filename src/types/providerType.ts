@@ -6,7 +6,7 @@ type Provider = {
   type: ProviderType;
   token: string;
   config?: {
-    app_id: string;
+    app_id: number;
     app_hash: string;
   };
   created_at: number;
@@ -18,8 +18,8 @@ type ProviderInfo = {
   name: string;
   type: ProviderType;
   token?: string;
-  app_id?: string;
-  app_hash?: string;
+  api_id?: number;
+  api_hash?: string;
 };
 
 export type { Provider, ProviderInfo };

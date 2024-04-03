@@ -76,6 +76,9 @@ const ProviderPage: React.FC = () => {
 
   const onSave = useCallback(
     (info: ProviderInfo, onReset: () => void) => {
+      info.api_id = (
+        info.api_id ? parseFloat(info.api_id as any) : undefined
+      ) as any;
       if (actionType === ActionType.Create) {
         providerStore.onSave(
           ProviderURL.base,
