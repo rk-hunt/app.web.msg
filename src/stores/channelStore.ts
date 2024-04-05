@@ -1,15 +1,15 @@
 import BaseStore from "./baseStore";
 import {
+  Channel,
   ChannelFilterBy,
   ChannelInfo,
   SelectLabelInValue,
-  Server,
 } from "../types";
 import { action, makeObservable, observable } from "mobx";
 import AuthStore from "./authStore";
 import { ProviderServerType, ServerChannelType } from "../constants";
 
-export default class ChannelStore extends BaseStore<Server> {
+export default class ChannelStore extends BaseStore<Channel> {
   channelInfo: ChannelInfo = {} as any;
   filterBy: ChannelFilterBy = {};
   serverTypes: SelectLabelInValue[] = [];

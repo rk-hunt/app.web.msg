@@ -4,27 +4,22 @@ import dayjs from "dayjs";
 import {
   Button,
   Col,
-  Flex,
   Form,
   Input,
   Layout,
   Modal,
-  Popover,
   Row,
   Select,
   Table,
   TableColumnsType,
 } from "antd";
-import {
-  DeleteOutlined,
-  FilterOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import { BlacklistType, BlacklistURL, datetimeFormat } from "../../constants";
 import SetupModal from "../Partial/SetupModal";
 import { Blacklist, BlacklistFilterBy, BlacklistInfo } from "../../types";
+import Filter from "../Partial/Filter";
 
 const { Content } = Layout;
 
@@ -33,7 +28,6 @@ const BlacklistPage: React.FC = () => {
   const { data, isFetching, pageContext, isSaving } = blacklistStore;
 
   const [visibleModal, setVisibleModal] = useState(false);
-  const [form] = Form.useForm<any>();
 
   const onOpenModal = useCallback(() => {
     setVisibleModal(!visibleModal);
@@ -150,35 +144,6 @@ const BlacklistPage: React.FC = () => {
     return columns;
   }, [onConfirmDeleting]);
 
-  const filterForm = useMemo(() => {
-    return (
-      <Form
-        layout="vertical"
-        form={form}
-        name="filter_form"
-        onFinish={onApplyFilter}
-        style={{ padding: 8, width: 300 }}
-      >
-        <Form.Item label="Value" name="value">
-          <Input placeholder="Value" allowClear />
-        </Form.Item>
-        <Form.Item label="Type" name="type">
-          <Select
-            placeholder="User"
-            options={[
-              { value: BlacklistType.User, label: BlacklistType.User },
-              { value: BlacklistType.Keyword, label: BlacklistType.Keyword },
-            ]}
-            allowClear
-          />
-        </Form.Item>
-        <Button type="primary" block htmlType="submit">
-          Apply
-        </Button>
-      </Form>
-    );
-  }, [form, onApplyFilter]);
-
   useEffect(() => {
     blacklistStore.onList(BlacklistURL.list);
     return () => {
@@ -188,27 +153,44 @@ const BlacklistPage: React.FC = () => {
 
   return (
     <Content>
-      <Header title="Blacklists" />
+      <Header
+        title="Blacklists"
+        extra={
+          <Button type="primary" icon={<PlusOutlined />} onClick={onOpenModal}>
+            New Blacklist
+          </Button>
+        }
+      />
       <Page title="Blacklists">
         <Row>
-          <Col span={24} style={{ marginBottom: 24 }}>
-            <Flex justify="space-between">
-              <Popover
-                content={filterForm}
-                trigger="click"
-                placement="bottomLeft"
-                arrow={false}
-              >
-                <Button icon={<FilterOutlined />}>Filter</Button>
-              </Popover>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={onOpenModal}
-              >
-                New Blacklist
-              </Button>
-            </Flex>
+          <Col span={24}>
+            <Filter onFilter={onApplyFilter}>
+              <Row gutter={32}>
+                <Col span={8}>
+                  <Form.Item label="Value" name="value">
+                    <Input placeholder="Value" allowClear />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Type" name="type">
+                    <Select
+                      placeholder="User"
+                      options={[
+                        {
+                          value: BlacklistType.User,
+                          label: BlacklistType.User,
+                        },
+                        {
+                          value: BlacklistType.Keyword,
+                          label: BlacklistType.Keyword,
+                        },
+                      ]}
+                      allowClear
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Filter>
           </Col>
           <Col span={24}>
             <Table

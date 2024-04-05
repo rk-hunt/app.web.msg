@@ -12,7 +12,7 @@ type HeaderProps = {
 const Header: React.FC<HeaderProps> = ({ title, extra }) => {
   return (
     <div className="header">
-      <Flex justify="space-between">
+      <Flex justify="space-between" align="center">
         <div>
           <Title>{title}</Title>
         </div>

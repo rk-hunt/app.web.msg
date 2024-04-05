@@ -6,22 +6,23 @@ import {
   Col,
   DatePicker,
   Dropdown,
-  Flex,
   Form,
   Input,
   Layout,
-  Popover,
   Row,
   Select,
   Table,
   TableColumnsType,
 } from "antd";
-import { FilterOutlined, ReloadOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import {
+  ChannelURL,
   MessageURL,
   ProviderURL,
+  ServerURL,
+  dateFormat,
   datetimeFormat,
   localStorageKey,
   refreshItems,
@@ -29,13 +30,19 @@ import {
 import { Message, MessageFilterBy } from "../../types";
 import Markdown from "react-markdown";
 import { sortByBuilder } from "../../utils";
+import Filter from "../Partial/Filter";
+import { debounce } from "lodash";
 
 const { Content } = Layout;
 const { RangePicker } = DatePicker;
 
 const MessagePage: React.FC = () => {
-  const { messageStore, providerStore } = useStores();
-  const { data: providers } = providerStore;
+  const { messageStore, providerStore, serverStore, channelStore } =
+    useStores();
+  const { data: providers, isFetching: isFetchingProvider } = providerStore;
+  const { data: servers, isFetching: isFetchingServer } = serverStore;
+  const { data: channels, isFetching: isFetchingChannel } = channelStore;
+
   const {
     data,
     isFetching,
@@ -46,10 +53,9 @@ const MessagePage: React.FC = () => {
     refreshInterval,
   } = messageStore;
 
-  const [form] = Form.useForm<any>();
-
   const onApplyFilter = useCallback(
     (values: MessageFilterBy) => {
+      const { provider, servers, channels, ...value } = values;
       if (values.received_at) {
         const receivedAt = values.received_at as any;
         values.received_at = {
@@ -61,11 +67,19 @@ const MessagePage: React.FC = () => {
             .valueOf(),
         };
       }
-
       const filter: MessageFilterBy = {
         ...messageStore.filterBy,
-        ...values,
+        ...value,
       };
+      if (provider) {
+        filter.provider_id = provider.value;
+      }
+      if (servers) {
+        filter.server_id = servers.map((server) => server.value);
+      }
+      if (channels) {
+        filter.channel_id = channels.map((channel) => channel.value);
+      }
 
       messageStore.setFilterBy(filter);
       messageStore.onListMessages(MessageURL.list, filter, sortBy);
@@ -100,6 +114,39 @@ const MessagePage: React.FC = () => {
     },
     [filterBy, messageStore]
   );
+
+  const onListProvider = useCallback(
+    (value: string) => {
+      providerStore.onList(ProviderURL.list, { name: value });
+    },
+    [providerStore]
+  );
+
+  const onSearchProvider = useMemo(() => {
+    return debounce(onListProvider, 800);
+  }, [onListProvider]);
+
+  const onListServer = useCallback(
+    (value: string) => {
+      serverStore.onList(ServerURL.list, { server_name: value });
+    },
+    [serverStore]
+  );
+
+  const onSearchServer = useMemo(() => {
+    return debounce(onListServer, 800);
+  }, [onListServer]);
+
+  const onListChannel = useCallback(
+    (value: string) => {
+      channelStore.onList(ChannelURL.list, { channel_name: value });
+    },
+    [channelStore]
+  );
+
+  const onSearchChannel = useMemo(() => {
+    return debounce(onListChannel, 800);
+  }, [onListChannel]);
 
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
@@ -150,57 +197,8 @@ const MessagePage: React.FC = () => {
     return columns;
   }, [highlightWeight]);
 
-  const filterForm = useMemo(() => {
-    return (
-      <Form
-        layout="vertical"
-        form={form}
-        name="filter_form"
-        onFinish={onApplyFilter}
-        style={{ padding: 8, width: 300 }}
-      >
-        <Form.Item label="Provider" name="provider_id">
-          <Select
-            placeholder="Discord"
-            options={providers.map((provider) => ({
-              value: provider._id,
-              label: provider.name,
-            }))}
-            allowClear
-          />
-        </Form.Item>
-        <Form.Item label="Author" name="author_username">
-          <Input placeholder="Username" allowClear />
-        </Form.Item>
-        <Form.Item label="Received At" name="received_at">
-          <RangePicker
-            presets={[
-              { label: "Today", value: [dayjs(), dayjs()] },
-              {
-                label: "This Week",
-                value: [dayjs().startOf("week"), dayjs().endOf("week")],
-              },
-              {
-                label: "This Month",
-                value: [dayjs().startOf("month"), dayjs().endOf("month")],
-              },
-            ]}
-            placeholder={["Start Date", "End Date"]}
-          />
-        </Form.Item>
-        <Form.Item label="Content" name="content">
-          <Input placeholder="Content" allowClear />
-        </Form.Item>
-        <Button type="primary" block htmlType="submit">
-          Apply
-        </Button>
-      </Form>
-    );
-  }, [form, providers, onApplyFilter]);
-
   useEffect(() => {
     messageStore.onListMessages(MessageURL.list);
-    providerStore.onList(ProviderURL.list);
     onCheckLocalInterval();
     return () => {
       messageStore.onReset();
@@ -209,31 +207,117 @@ const MessagePage: React.FC = () => {
 
   return (
     <Content>
-      <Header title="Messages" />
+      <Header
+        title="Messages"
+        extra={
+          <Dropdown
+            menu={{
+              items: refreshItems,
+              selectable: true,
+              onSelect: onSelectedRefreshInterval,
+            }}
+          >
+            <Button
+              icon={<ReloadOutlined />}
+            >{`Refresh Every ${refreshInterval.label}`}</Button>
+          </Dropdown>
+        }
+      />
       <Page title="Messages">
         <Row>
-          <Col span={24} style={{ marginBottom: 24 }}>
-            <Flex justify="space-between">
-              <Popover
-                content={filterForm}
-                trigger="click"
-                placement="bottomLeft"
-                arrow={false}
-              >
-                <Button icon={<FilterOutlined />}>Filter</Button>
-              </Popover>
-              <Dropdown
-                menu={{
-                  items: refreshItems,
-                  selectable: true,
-                  onSelect: onSelectedRefreshInterval,
-                }}
-              >
-                <Button
-                  icon={<ReloadOutlined />}
-                >{`Refresh Every ${refreshInterval.label}`}</Button>
-              </Dropdown>
-            </Flex>
+          <Col span={24}>
+            <Filter onFilter={onApplyFilter}>
+              <Row gutter={32}>
+                <Col span={8}>
+                  <Form.Item label="Provider" name="provider">
+                    <Select
+                      showSearch
+                      allowClear
+                      filterOption={false}
+                      loading={isFetchingProvider}
+                      onSearch={onSearchProvider}
+                      placeholder="Type to search"
+                      labelInValue
+                      options={providers.map((provider) => ({
+                        value: provider._id,
+                        label: provider.name,
+                      }))}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Server" name="servers">
+                    <Select
+                      showSearch
+                      allowClear
+                      filterOption={false}
+                      loading={isFetchingServer}
+                      onSearch={onSearchServer}
+                      mode="multiple"
+                      placeholder="Type to search"
+                      labelInValue
+                      options={servers.map((server) => ({
+                        value: server.server_id,
+                        label: server.server_name,
+                      }))}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Channel" name="channels">
+                    <Select
+                      showSearch
+                      allowClear
+                      filterOption={false}
+                      loading={isFetchingChannel}
+                      onSearch={onSearchChannel}
+                      placeholder="Type to search"
+                      labelInValue
+                      options={channels.map((channel) => ({
+                        value: channel.channel_id,
+                        label: channel.channel_name,
+                      }))}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Author" name="author_username">
+                    <Input placeholder="Username" allowClear />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Received At" name="received_at">
+                    <RangePicker
+                      format={dateFormat}
+                      presets={[
+                        { label: "Today", value: [dayjs(), dayjs()] },
+                        {
+                          label: "This Week",
+                          value: [
+                            dayjs().startOf("week"),
+                            dayjs().endOf("week"),
+                          ],
+                        },
+                        {
+                          label: "This Month",
+                          value: [
+                            dayjs().startOf("month"),
+                            dayjs().endOf("month"),
+                          ],
+                        },
+                      ]}
+                      placeholder={["Start Date", "End Date"]}
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Content" name="content">
+                    <Input placeholder="Content" allowClear />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Filter>
           </Col>
           <Col span={24}>
             <Table

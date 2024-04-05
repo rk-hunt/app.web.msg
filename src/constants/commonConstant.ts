@@ -59,6 +59,7 @@ const menus = [
 ];
 
 const datetimeFormat = "DD/MM/YY HH:mm:ss";
+const dateFormat = "DD/MM/YY";
 
 const refreshItems: MessageRefreshInterval[] = [
   { key: 0, label: "Off" },
@@ -148,6 +149,7 @@ const importOptionalFields = ["api_id", "api_hash"];
 export {
   menus,
   datetimeFormat,
+  dateFormat,
   refreshItems,
   localStorageKey,
   exportField,

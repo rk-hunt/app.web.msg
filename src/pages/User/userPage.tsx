@@ -4,24 +4,23 @@ import dayjs from "dayjs";
 import {
   Button,
   Col,
-  Flex,
   Form,
   Input,
   Layout,
   Modal,
-  Popover,
   Row,
   Select,
   Table,
   TableColumnsType,
   Tag,
 } from "antd";
-import { EditOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import { UserURL, datetimeFormat, UserStatus } from "../../constants";
 import SetupModal from "../Partial/SetupModal";
 import { UserFilterBy, User, WeightInfo } from "../../types";
+import Filter from "../Partial/Filter";
 
 const { Content } = Layout;
 
@@ -30,7 +29,6 @@ const UserPage: React.FC = () => {
   const { data, isFetching, pageContext, isSaving } = userStore;
 
   const [visibleModal, setVisibleModal] = useState(false);
-  const [form] = Form.useForm<any>();
 
   const onOpenModal = useCallback(() => {
     setVisibleModal(!visibleModal);
@@ -179,25 +177,6 @@ const UserPage: React.FC = () => {
     return columns;
   }, [onConfirmUpdate]);
 
-  const filterForm = useMemo(() => {
-    return (
-      <Form
-        layout="vertical"
-        form={form}
-        name="filter_form"
-        onFinish={onApplyFilter}
-        style={{ padding: 8, width: 300 }}
-      >
-        <Form.Item label="Email" name="email">
-          <Input placeholder="email@token.info" allowClear />
-        </Form.Item>
-        <Button type="primary" block htmlType="submit">
-          Apply
-        </Button>
-      </Form>
-    );
-  }, [form, onApplyFilter]);
-
   useEffect(() => {
     userStore.onList(UserURL.list);
     return () => {
@@ -207,27 +186,26 @@ const UserPage: React.FC = () => {
 
   return (
     <Content>
-      <Header title="Users" />
+      <Header
+        title="Users"
+        extra={
+          <Button type="primary" icon={<PlusOutlined />} onClick={onOpenModal}>
+            New User
+          </Button>
+        }
+      />
       <Page title="Users">
         <Row>
-          <Col span={24} style={{ marginBottom: 24 }}>
-            <Flex justify="space-between">
-              <Popover
-                content={filterForm}
-                trigger="click"
-                placement="bottomLeft"
-                arrow={false}
-              >
-                <Button icon={<FilterOutlined />}>Filter</Button>
-              </Popover>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={onOpenModal}
-              >
-                New User
-              </Button>
-            </Flex>
+          <Col span={24}>
+            <Filter onFilter={onApplyFilter}>
+              <Row gutter={32}>
+                <Col span={8}>
+                  <Form.Item label="Email" name="email">
+                    <Input placeholder="email@token.info" allowClear />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Filter>
           </Col>
           <Col span={24}>
             <Table

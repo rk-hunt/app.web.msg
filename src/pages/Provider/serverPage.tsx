@@ -5,24 +5,17 @@ import { debounce } from "lodash";
 import {
   Button,
   Col,
-  Flex,
   Form,
   Input,
   Layout,
   Modal,
-  Popover,
   Row,
   Select,
   Space,
   Table,
   TableColumnsType,
 } from "antd";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  FilterOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import {
@@ -39,6 +32,7 @@ import {
   ServerReqInfo,
 } from "../../types";
 import SetupModal from "../Partial/SetupModal";
+import Filter from "../Partial/Filter";
 
 const { Content } = Layout;
 
@@ -47,8 +41,6 @@ const ServerPage: React.FC = () => {
   const { data: providers, isFetching: isFetchingProvider } = providerStore;
   const { data, isFetching, pageContext, isSaving, serverInfo, providerTypes } =
     serverStore;
-
-  const [form] = Form.useForm<any>();
   const [visibleModal, setVisibleModal] = useState(false);
   const [actionType, setActionType] = useState(ActionType.Create);
 
@@ -62,10 +54,14 @@ const ServerPage: React.FC = () => {
 
   const onApplyFilter = useCallback(
     (values: any) => {
+      const { provider, ...value } = values;
       const filter: ServerFilterBy = {
         ...serverStore.filterBy,
-        ...values,
+        ...value,
       };
+      if (provider) {
+        filter.provider_id = provider.value;
+      }
 
       serverStore.setFilterBy(filter);
       serverStore.onList(ServerURL.list, filter);
@@ -159,7 +155,7 @@ const ServerPage: React.FC = () => {
     [serverStore]
   );
 
-  const onSearchServer = useCallback(
+  const onSearchProvider = useCallback(
     (value: string) => {
       providerStore.onList(ProviderURL.list, { name: value });
     },
@@ -167,8 +163,8 @@ const ServerPage: React.FC = () => {
   );
 
   const onSearch = useMemo(() => {
-    return debounce(onSearchServer, 800);
-  }, [onSearchServer]);
+    return debounce(onSearchProvider, 800);
+  }, [onSearchProvider]);
 
   const onSelectedProvider = useCallback(
     (value: SelectLabelInValue) => {
@@ -238,38 +234,6 @@ const ServerPage: React.FC = () => {
     return columns;
   }, [onConfirmDeleting, onEdit]);
 
-  const filterForm = useMemo(() => {
-    return (
-      <Form
-        layout="vertical"
-        form={form}
-        name="filter_form"
-        onFinish={onApplyFilter}
-        style={{ padding: 8, width: 300 }}
-      >
-        <Form.Item label="Name" name="server_name">
-          <Input placeholder="Professor" allowClear />
-        </Form.Item>
-        <Form.Item label="Server Id" name="server_id">
-          <Input placeholder="00001" allowClear />
-        </Form.Item>
-        <Form.Item label="Provider" name="provider_id">
-          <Select
-            placeholder="Discord"
-            options={providers.map((provider) => ({
-              value: provider._id,
-              label: provider.name,
-            }))}
-            allowClear
-          />
-        </Form.Item>
-        <Button type="primary" block htmlType="submit">
-          Apply
-        </Button>
-      </Form>
-    );
-  }, [form, providers, onApplyFilter]);
-
   useEffect(() => {
     serverStore.onList(ServerURL.list);
     return () => {
@@ -279,27 +243,52 @@ const ServerPage: React.FC = () => {
 
   return (
     <Content>
-      <Header title="Servers" />
+      <Header
+        title="Servers"
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={onOpenModal.bind(null, ActionType.Create)}
+          >
+            New Server
+          </Button>
+        }
+      />
       <Page title="Servers">
         <Row>
-          <Col span={24} style={{ marginBottom: 24 }}>
-            <Flex justify="space-between">
-              <Popover
-                content={filterForm}
-                trigger="click"
-                placement="bottomLeft"
-                arrow={false}
-              >
-                <Button icon={<FilterOutlined />}>Filter</Button>
-              </Popover>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={onOpenModal.bind(null, ActionType.Create)}
-              >
-                New Server
-              </Button>
-            </Flex>
+          <Col span={24}>
+            <Filter onFilter={onApplyFilter}>
+              <Row gutter={32}>
+                <Col span={8}>
+                  <Form.Item label="Name" name="server_name">
+                    <Input placeholder="Professor" allowClear />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Server Id" name="server_id">
+                    <Input placeholder="00001" allowClear />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Provider" name="provider">
+                    <Select
+                      showSearch
+                      allowClear
+                      filterOption={false}
+                      loading={isFetchingProvider}
+                      onSearch={onSearch}
+                      placeholder="Type to search"
+                      labelInValue
+                      options={providers.map((provider) => ({
+                        value: provider._id,
+                        label: provider.name,
+                      }))}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Filter>
           </Col>
           <Col span={24}>
             <Table

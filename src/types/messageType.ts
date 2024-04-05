@@ -1,4 +1,4 @@
-import { DateRange } from "./commonType";
+import { DateRange, SelectLabelInValue } from "./commonType";
 
 type Message = {
   _id: string;
@@ -20,7 +20,12 @@ type Message = {
 };
 
 type MessageFilterBy = {
+  provider?: SelectLabelInValue;
   provider_id?: string;
+  servers?: SelectLabelInValue[];
+  server_id?: string[];
+  channels?: SelectLabelInValue[];
+  channel_id?: string[];
   author_username?: string;
   received_at?: DateRange;
   content?: string;

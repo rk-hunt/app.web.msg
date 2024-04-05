@@ -64,7 +64,7 @@ const SetupModal: React.FC<React.PropsWithChildren<SetupModalProps>> = ({
       <Form
         layout="vertical"
         form={form}
-        name="provider_form"
+        name="setup_form"
         style={{ paddingTop: 24, paddingBottom: 24 }}
       >
         {children}

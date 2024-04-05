@@ -5,24 +5,17 @@ import { debounce } from "lodash";
 import {
   Button,
   Col,
-  Flex,
   Form,
   Input,
   Layout,
   Modal,
-  Popover,
   Row,
   Select,
   Space,
   Table,
   TableColumnsType,
 } from "antd";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  FilterOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import {
@@ -39,6 +32,7 @@ import {
   SelectLabelInValue,
 } from "../../types";
 import SetupModal from "../Partial/SetupModal";
+import Filter from "../Partial/Filter";
 
 const { Content } = Layout;
 
@@ -48,7 +42,6 @@ const ChannelPage: React.FC = () => {
   const { data, isFetching, pageContext, isSaving, serverTypes, channelInfo } =
     channelStore;
 
-  const [form] = Form.useForm<any>();
   const [visibleModal, setVisibleModal] = useState(false);
   const [actionType, setActionType] = useState(ActionType.Create);
 
@@ -242,42 +235,6 @@ const ChannelPage: React.FC = () => {
     return columns;
   }, [onConfirmDeleting, onEdit]);
 
-  const filterForm = useMemo(() => {
-    return (
-      <Form
-        layout="vertical"
-        form={form}
-        name="filter_form"
-        onFinish={onApplyFilter}
-        style={{ padding: 8, width: 300 }}
-      >
-        <Form.Item label="Name" name="channel_name">
-          <Input placeholder="Announcement" allowClear />
-        </Form.Item>
-        <Form.Item label="Channel Id" name="channel_id">
-          <Input placeholder="00001" allowClear />
-        </Form.Item>
-        <Form.Item label="Server" name="server_id">
-          <Select
-            showSearch
-            filterOption={false}
-            loading={isFetchingServer}
-            onSearch={onSearch}
-            placeholder="General"
-            options={servers.map((server) => ({
-              value: server._id,
-              label: server.server_name,
-            }))}
-            allowClear
-          />
-        </Form.Item>
-        <Button type="primary" block htmlType="submit">
-          Apply
-        </Button>
-      </Form>
-    );
-  }, [form, servers, onApplyFilter, onSearch, isFetchingServer]);
-
   useEffect(() => {
     channelStore.onList(ChannelURL.list);
     return () => {
@@ -287,27 +244,51 @@ const ChannelPage: React.FC = () => {
 
   return (
     <Content>
-      <Header title="Channels" />
+      <Header
+        title="Channels"
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={onOpenModal.bind(null, ActionType.Create)}
+          >
+            New Channel
+          </Button>
+        }
+      />
       <Page title="Channels">
         <Row>
-          <Col span={24} style={{ marginBottom: 24 }}>
-            <Flex justify="space-between">
-              <Popover
-                content={filterForm}
-                trigger="click"
-                placement="bottomLeft"
-                arrow={false}
-              >
-                <Button icon={<FilterOutlined />}>Filter</Button>
-              </Popover>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={onOpenModal.bind(null, ActionType.Create)}
-              >
-                New Channel
-              </Button>
-            </Flex>
+          <Col span={24}>
+            <Filter onFilter={onApplyFilter}>
+              <Row gutter={32}>
+                <Col span={8}>
+                  <Form.Item label="Name" name="channel_name">
+                    <Input placeholder="Announcement" allowClear />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Channel Id" name="channel_id">
+                    <Input placeholder="1203356362361274400" allowClear />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="Server" name="server_id">
+                    <Select
+                      showSearch
+                      filterOption={false}
+                      loading={isFetchingServer}
+                      onSearch={onSearch}
+                      placeholder="General"
+                      options={servers.map((server) => ({
+                        value: server._id,
+                        label: server.server_name,
+                      }))}
+                      allowClear
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Filter>
           </Col>
           <Col span={24}>
             <Table
