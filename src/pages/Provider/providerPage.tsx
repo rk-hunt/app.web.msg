@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 import {
   Button,
   Col,
-  Flex,
   Form,
   Input,
   Layout,
@@ -158,20 +157,20 @@ const ProviderPage: React.FC = () => {
 
   return (
     <Content>
-      <Header title="Providers" />
+      <Header
+        title="Providers"
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={onOpenModal.bind(null, ActionType.Create)}
+          >
+            New Provider
+          </Button>
+        }
+      />
       <Page title="Providers">
         <Row>
-          <Col span={24} style={{ marginBottom: 24 }}>
-            <Flex justify="flex-end">
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={onOpenModal.bind(null, ActionType.Create)}
-              >
-                New Provider
-              </Button>
-            </Flex>
-          </Col>
           <Col span={24}>
             <Table
               rowKey="_id"

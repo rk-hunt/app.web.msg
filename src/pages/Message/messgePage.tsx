@@ -20,11 +20,13 @@ import { Header, Page } from "../../components";
 import {
   ChannelURL,
   MessageURL,
+  ProviderType,
   ProviderURL,
   ServerURL,
   dateFormat,
   datetimeFormat,
   localStorageKey,
+  providerLink,
   refreshItems,
 } from "../../constants";
 import { Message, MessageFilterBy } from "../../types";
@@ -185,11 +187,27 @@ const MessagePage: React.FC = () => {
         dataIndex: "content",
         width: "30%",
         render: (_: string, message: Message) => {
+          const url =
+            message.provider_type === ProviderType.Discord
+              ? `${providerLink.Discord}/${message.server_id}/${message.channel_id}`
+              : `${providerLink.Telegram}${message.server_id}`;
+
           if (message.weight >= highlightWeight) {
-            return <Markdown>{message.content}</Markdown>;
-            // <span className="text-highlight">
+            return (
+              <a href={url} target="_blank" rel="noreferrer">
+                <mark className="text-highlight">
+                  <Markdown>{message.content}</Markdown>
+                </mark>
+              </a>
+            );
           }
-          return message.content;
+          return (
+            <a href={url} target="_blank" rel="noreferrer">
+              <mark>
+                <Markdown>{message.content}</Markdown>
+              </mark>
+            </a>
+          );
         },
       },
     ];

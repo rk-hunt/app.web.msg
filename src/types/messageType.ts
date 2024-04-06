@@ -1,9 +1,11 @@
+import { ProviderType } from "../constants";
 import { DateRange, SelectLabelInValue } from "./commonType";
 
 type Message = {
   _id: string;
   provider_id: string;
   provider_name: string;
+  provider_type: ProviderType;
   server_id: string;
   server_name: string;
   channel_id?: string;

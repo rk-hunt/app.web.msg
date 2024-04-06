@@ -23,10 +23,10 @@ body {
   font-size: 18px;
 }
 
-.ant-table {
+/* .ant-table {
   max-height: calc(100vh - 270px) !important;
   overflow-y: auto !important;
-}
+} */
 
 .ant-table-cell {
   background: #ffffff !important;
@@ -63,6 +63,10 @@ body {
   /* border: 1px solid; */
 }
 
-.text-highlight {
-  background-color: #ffff00;
+.text-highlight * {
+  background-color: #ffff00 !important;
+}
+
+.text-default { 
+  color: #000000e0 !important;
 }

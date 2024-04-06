@@ -146,6 +146,11 @@ const numberImportPerRequest = 25;
 const numberFields = ["weight", "api_id"];
 const importOptionalFields = ["api_id", "api_hash"];
 
+const providerLink = {
+  Discord: "https://discord.com/channels",
+  Telegram: "https://web.telegram.org/a/#",
+};
+
 export {
   menus,
   datetimeFormat,
@@ -162,4 +167,5 @@ export {
   numberImportPerRequest,
   numberFields,
   importOptionalFields,
+  providerLink,
 };

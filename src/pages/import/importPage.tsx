@@ -238,7 +238,7 @@ const ImportPage: React.FC = () => {
               </Row>
             </Card>
           </Col>
-          <Col span={24}>
+          <Col span={24} style={{ marginBottom: 24 }}>
             <Table
               rowKey="_id"
               columns={tableColumns}
