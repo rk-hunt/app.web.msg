@@ -11,10 +11,12 @@ import { observer } from "mobx-react-lite";
 import { Routes, Route, Link } from "react-router-dom";
 import { Button, Divider, Layout, Menu } from "antd";
 import {
+  BellOutlined,
   DiscordOutlined,
   DownloadOutlined,
   FileDoneOutlined,
   GroupOutlined,
+  HistoryOutlined,
   MessageOutlined,
   PercentageOutlined,
   PoweroffOutlined,
@@ -35,6 +37,8 @@ const UserPage = lazy(() => import("./pages/User/userPage"));
 const MessagePage = lazy(() => import("./pages/Message/messgePage"));
 const ExportPage = lazy(() => import("./pages/export/exportPage"));
 const ImportPage = lazy(() => import("./pages/import/importPage"));
+const AlertPage = lazy(() => import("./pages/Alert/alertPage"));
+const AlertHistoryPage = lazy(() => import("./pages/Alert/alertHistoryPage"));
 
 const { Sider } = Layout;
 const onGetIcons = (name: string): React.ReactNode => {
@@ -57,6 +61,10 @@ const onGetIcons = (name: string): React.ReactNode => {
       return <DownloadOutlined />;
     case "imports":
       return <UploadOutlined />;
+    case "alerts":
+      return <BellOutlined />;
+    case "alert-histories":
+      return <HistoryOutlined />;
   }
 };
 
@@ -178,6 +186,22 @@ const App: React.FC = () => {
             element={
               <AuthRoute>
                 <MessagePage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/alerts"
+            element={
+              <AuthRoute>
+                <AlertPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/alert-histories"
+            element={
+              <AuthRoute>
+                <AlertHistoryPage />
               </AuthRoute>
             }
           />

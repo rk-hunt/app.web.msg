@@ -39,6 +39,18 @@ const menus = [
     key: "messages",
   },
   {
+    name: "Alerts",
+    icon: "alerts",
+    url: "/alerts",
+    key: "alerts",
+  },
+  {
+    name: "Alert Histories",
+    icon: "alert-histories",
+    url: "/alert-histories",
+    key: "alert-histories",
+  },
+  {
     name: "Users",
     icon: "users",
     url: "/users",
@@ -99,12 +111,10 @@ const exportField = {
   weight: ["_id", "value", "type", "weight"],
   blacklist: ["_id", "value", "type"],
 };
-
 const importFileType = {
   csv: "text/csv",
   xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 };
-
 const importProviderColumns: TableColumnsType<any> = [
   { title: "Name", dataIndex: "name" },
   { title: "Type", dataIndex: "type" },
@@ -112,7 +122,6 @@ const importProviderColumns: TableColumnsType<any> = [
   { title: "API Id", dataIndex: "api_id" },
   { title: "API Hash", dataIndex: "api_hash", ellipsis: true },
 ];
-
 const importServerColumns: TableColumnsType<any> = [
   { title: "Name", dataIndex: "server_name" },
   { title: "Server Id", dataIndex: "server_id" },
@@ -120,7 +129,6 @@ const importServerColumns: TableColumnsType<any> = [
   { title: "Provider Id", dataIndex: "provider_id" },
   { title: "Provider", dataIndex: "provider_name" },
 ];
-
 const importChannelColumns: TableColumnsType<any> = [
   { title: "Name", dataIndex: "channel_name" },
   { title: "Channel Id", dataIndex: "channel_id" },
@@ -130,19 +138,17 @@ const importChannelColumns: TableColumnsType<any> = [
   { title: "Provider Id", dataIndex: "provider_id" },
   { title: "Provider", dataIndex: "provider_name" },
 ];
-
 const importWeightColumns: TableColumnsType<any> = [
   { title: "Value", dataIndex: "value" },
   { title: "Type", dataIndex: "type" },
   { title: "Weight", dataIndex: "weight" },
 ];
-
 const importBlacklistColumns: TableColumnsType<any> = [
   { title: "Value", dataIndex: "value" },
   { title: "Type", dataIndex: "type" },
 ];
-
 const numberImportPerRequest = 25;
+
 const numberFields = ["weight", "api_id"];
 const importOptionalFields = ["api_id", "api_hash"];
 

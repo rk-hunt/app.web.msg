@@ -8,6 +8,8 @@ import ServerStore from "./serverStore";
 import ChannelStore from "./channelStore";
 import UserStore from "./userStore";
 import MessageStore from "./messageStore";
+import AlertStore from "./alertStore";
+import AlertHistoryStore from "./alertHistoryStore";
 
 const authStore = new AuthStore();
 const baseStore = new BaseStore(authStore);
@@ -18,6 +20,8 @@ const blacklistStore = new BlacklistStore(authStore);
 const weightStore = new WeightStore(authStore);
 const userStore = new UserStore(authStore);
 const messageStore = new MessageStore(authStore);
+const alertStore = new AlertStore(authStore);
+const alertHistoryStore = new AlertHistoryStore(authStore);
 
 const storesContext = React.createContext({
   authStore,
@@ -29,6 +33,8 @@ const storesContext = React.createContext({
   channelStore,
   userStore,
   messageStore,
+  alertStore,
+  alertHistoryStore,
 });
 
 const useStores = () => React.useContext(storesContext);

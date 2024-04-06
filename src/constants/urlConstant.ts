@@ -41,6 +41,12 @@ const MessageURL = {
   list: `${API_URL}/messages`,
 };
 
+const AlertURL = {
+  base: `${API_URL}/alert`,
+  list: `${API_URL}/alerts`,
+  history: `${API_URL}/alert/histories`,
+};
+
 export {
   AuthURL,
   ProviderURL,
@@ -50,4 +56,5 @@ export {
   WeightURL,
   UserURL,
   MessageURL,
+  AlertURL,
 };

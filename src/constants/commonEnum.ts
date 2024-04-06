@@ -71,6 +71,12 @@ enum ImportStatus {
   Error = "Error",
 }
 
+enum AlertFrequencyType {
+  Always = "Always",
+  Once = "Once",
+  OncePerDay = "Once Per Day",
+}
+
 export {
   HttpCode,
   WeightType,
@@ -83,4 +89,5 @@ export {
   ImportExportConfig,
   ImportExportExtension,
   ImportStatus,
+  AlertFrequencyType,
 };
