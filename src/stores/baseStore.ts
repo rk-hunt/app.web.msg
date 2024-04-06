@@ -239,7 +239,6 @@ export default class BaseStore<TData> {
         fields,
         importOptionalFields
       );
-      console.log("validated: ", validated);
       if (validated === false) {
         invalidCount += 1;
         data.status = ImportStatus.Invalid;

@@ -120,7 +120,6 @@ const ImportPage: React.FC = () => {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(sheet);
-        console.log("jsonData: ", jsonData);
         baseStore.setImportData(jsonData);
       };
       reader.readAsArrayBuffer(file);

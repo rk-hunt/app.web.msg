@@ -35,7 +35,6 @@ const BlacklistPage: React.FC = () => {
 
   const onApplyFilter = useCallback(
     (values: any) => {
-      console.log("values: ", values);
       const filter: BlacklistFilterBy = {
         ...blacklistStore.filterBy,
         ...values,

@@ -57,7 +57,6 @@ export default class MessageStore extends BaseStore<Message> {
   }
 
   async onListMessages(url: string, filterBy?: any, sortBy?: any, page = 1) {
-    console.log("sort by in store: ", sortBy);
     const messages = await super.onList(url, filterBy, page, sortBy, true);
 
     if (messages !== undefined && messages.length > 0) {
