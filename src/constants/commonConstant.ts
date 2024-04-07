@@ -157,6 +157,60 @@ const providerLink = {
   Telegram: "https://web.telegram.org/a/#",
 };
 
+const fieldTypes = [
+  {
+    field: "providers",
+    type: "objectId",
+  },
+  {
+    field: "servers",
+    type: "string",
+  },
+  {
+    field: "channels",
+    type: "string",
+  },
+  {
+    field: "authors",
+    type: "string",
+  },
+  {
+    field: "received_at",
+    type: "datetime",
+  },
+  {
+    field: "content",
+    type: "search",
+  },
+];
+
+const alertFieldValues = [
+  {
+    value: "providers",
+    label: "Provider",
+  },
+  {
+    value: "servers",
+    label: "Server",
+  },
+  {
+    value: "channels",
+    label: "Channels",
+  },
+  {
+    value: "authors",
+    label: "Authors",
+  },
+  {
+    value: "received_at",
+    label: "Received At",
+  },
+  {
+    value: "content",
+    label: "Content",
+  },
+];
+
 export {
   menus,
   datetimeFormat,
@@ -174,4 +228,6 @@ export {
   numberFields,
   importOptionalFields,
   providerLink,
+  fieldTypes,
+  alertFieldValues,
 };

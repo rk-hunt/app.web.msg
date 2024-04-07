@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 import dayjs from "dayjs";
 import {
@@ -15,15 +15,32 @@ import {
 import { PlusOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
-import { AlertFrequencyType, AlertURL, datetimeFormat } from "../../constants";
-import { AlertFilterBy } from "../../types";
+import {
+  ActionType,
+  AlertFrequencyType,
+  AlertURL,
+  datetimeFormat,
+} from "../../constants";
+import { AlertFilterBy, AlertFilterForm } from "../../types";
 import Filter from "../Partial/Filter";
+import AlertModal from "./alertModal";
 
 const { Content } = Layout;
 
 const AlertPage: React.FC = () => {
   const { alertStore } = useStores();
-  const { data, isFetching, pageContext } = alertStore;
+  const { data, isFetching, pageContext, isSaving } = alertStore;
+
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [actionType, setActionType] = useState(ActionType.Create);
+
+  const onOpenModal = useCallback(
+    (action: ActionType) => {
+      setActionType(action);
+      setVisibleModal(!visibleModal);
+    },
+    [visibleModal]
+  );
 
   const onApplyFilter = useCallback(
     (values: any) => {
@@ -43,6 +60,11 @@ const AlertPage: React.FC = () => {
       alertStore.onList(AlertURL.list, alertStore.filterBy, page);
     },
     [alertStore]
+  );
+
+  const onSave = useCallback(
+    (info: any, filterForms: AlertFilterForm[], onReset: () => void) => {},
+    []
   );
 
   const tableColumns = useMemo(() => {
@@ -86,7 +108,11 @@ const AlertPage: React.FC = () => {
       <Header
         title="Alerts"
         extra={
-          <Button type="primary" icon={<PlusOutlined />}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={onOpenModal.bind(null, ActionType.Create)}
+          >
             New Alert
           </Button>
         }
@@ -147,6 +173,13 @@ const AlertPage: React.FC = () => {
           </Col>
         </Row>
       </Page>
+      <AlertModal
+        title={actionType === ActionType.Create ? "New Alert" : `Edit Alert`}
+        visible={visibleModal}
+        isSaving={isSaving}
+        onCancel={onOpenModal.bind(null, ActionType.Create)}
+        onSave={onSave}
+      />
     </Content>
   );
 };

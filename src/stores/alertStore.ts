@@ -1,6 +1,6 @@
 import { action, makeObservable, observable } from "mobx";
 import BaseStore from "./baseStore";
-import { Alert, AlertFilterBy } from "../types";
+import { Alert, AlertFilterBy, AlertFilterForm, AlertInfo } from "../types";
 import AuthStore from "./authStore";
 
 export default class AlertStore extends BaseStore<Alert> {
@@ -17,4 +17,10 @@ export default class AlertStore extends BaseStore<Alert> {
   setFilterBy(val: any) {
     this.filterBy = val;
   }
+
+  async onSaveAlert(
+    info: AlertInfo,
+    filter: AlertFilterForm[],
+    callback: () => void
+  ) {}
 }

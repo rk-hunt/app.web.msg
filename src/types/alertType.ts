@@ -1,11 +1,16 @@
-import { AlertFrequencyType } from "../constants";
+import {
+  AlertFrequencyType,
+  AlertOperator,
+  AlertRuleType,
+  AlertType,
+} from "../constants";
 
 type Alert = {
   _id: string;
   name: string;
   frequency_type: AlertFrequencyType;
-  filters: any[];
-  rules: any[];
+  filters: AlertFilter[];
+  rules: AlertRule[];
   last_alert_at: number;
   created_at: number;
   updated_at: number;
@@ -24,4 +29,49 @@ type AlertHistory = {
   updated_at: number;
 };
 
-export type { Alert, AlertHistory, AlertFilterBy };
+type AlertFilterDateTime = {
+  start: number;
+  value: number;
+  unit: "minutes" | "hours" | "days" | "months";
+};
+
+type AlertFilter = {
+  field: string;
+  type: AlertType;
+  operator: AlertOperator;
+  value: any;
+};
+
+type AlertRule = {
+  type: AlertRuleType;
+  operator: AlertOperator;
+  times: any;
+};
+
+type AlertFilterForm = {
+  key: number;
+  name?: string;
+  field?: string;
+  type?: AlertType;
+  operator?: AlertOperator;
+  value?: any;
+};
+
+type AlertInfo = {
+  _id?: string;
+  name: string;
+  frequency_type: AlertFrequencyType;
+  type: AlertRuleType;
+  operator: string;
+  times: string;
+};
+
+export type {
+  Alert,
+  AlertHistory,
+  AlertFilterBy,
+  AlertFilterDateTime,
+  AlertFilter,
+  AlertFilterForm,
+  AlertInfo,
+};

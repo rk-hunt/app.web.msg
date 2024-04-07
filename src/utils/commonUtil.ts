@@ -2,6 +2,8 @@ import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
 import message from "./message";
 import {
+  AlertOperator,
+  AlertType,
   BlacklistURL,
   ChannelURL,
   ImportExportConfig,
@@ -9,6 +11,7 @@ import {
   ServerURL,
   WeightURL,
   exportField,
+  fieldTypes,
 } from "../constants";
 import { ExportOption, FieldSortOrder } from "../types";
 
@@ -123,4 +126,44 @@ const objectValueValidator = (
   return true;
 };
 
-export { exportToExcel, getExportOption, sortByBuilder, objectValueValidator };
+const alertOperators = (type: AlertType) => {
+  switch (type) {
+    case AlertType.ObjectId:
+      return [
+        { value: AlertOperator.Equal, label: AlertOperator.Equal },
+        { value: AlertOperator.In, label: AlertOperator.In },
+      ];
+    case AlertType.String:
+      return [
+        { value: AlertOperator.Equal, label: AlertOperator.Equal },
+        { value: AlertOperator.In, label: AlertOperator.In },
+      ];
+    case AlertType.DateTime:
+      return [{ value: AlertOperator.Within, label: AlertOperator.Within }];
+    case AlertType.Search:
+      return [{ value: AlertOperator.Contain, label: AlertOperator.Contain }];
+    default:
+      return [
+        { value: AlertOperator.Equal, label: AlertOperator.Equal },
+        { value: AlertOperator.In, label: AlertOperator.In },
+      ];
+  }
+};
+
+const alertFieldType = (field: string) => {
+  return fieldTypes.find((fieldType) => fieldType.field === field);
+};
+
+const randomNumber = (max = 88888888): number => {
+  return Math.floor(Math.random() * max) + 1;
+};
+
+export {
+  exportToExcel,
+  getExportOption,
+  sortByBuilder,
+  objectValueValidator,
+  alertOperators,
+  alertFieldType,
+  randomNumber,
+};

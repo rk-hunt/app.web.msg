@@ -77,6 +77,36 @@ enum AlertFrequencyType {
   OncePerDay = "Once Per Day",
 }
 
+enum AlertOperator {
+  Contain = "contain",
+  Equal = "equal",
+  In = "in",
+  Within = "within",
+  GreaterThan = "greater than",
+  GreaterThanOrEqual = "greater than equal",
+  LessThan = "less than",
+  LessThanOrEqual = "less than equal",
+}
+
+enum AlertType {
+  ObjectId = "objectId",
+  Number = "number",
+  String = "string",
+  DateTime = "datetime",
+  Search = "search",
+}
+
+enum AlertRuleType {
+  Count = "count",
+}
+
+enum AlertFilterDateTimeUnit {
+  minutes = "minutes",
+  hours = "hours",
+  days = "days",
+  months = "months",
+}
+
 export {
   HttpCode,
   WeightType,
@@ -90,4 +120,8 @@ export {
   ImportExportExtension,
   ImportStatus,
   AlertFrequencyType,
+  AlertOperator,
+  AlertType,
+  AlertRuleType,
+  AlertFilterDateTimeUnit,
 };
