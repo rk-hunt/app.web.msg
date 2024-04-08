@@ -66,6 +66,13 @@ type AlertInfo = {
   times: string;
 };
 
+type AlertReq = {
+  name: string;
+  frequency_type: AlertFrequencyType;
+  filters: AlertFilter[];
+  rules: AlertRule[];
+};
+
 export type {
   Alert,
   AlertHistory,
@@ -73,5 +80,7 @@ export type {
   AlertFilterDateTime,
   AlertFilter,
   AlertFilterForm,
+  AlertRule,
   AlertInfo,
+  AlertReq,
 };

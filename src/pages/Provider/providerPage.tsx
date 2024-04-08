@@ -66,7 +66,6 @@ const ProviderPage: React.FC = () => {
   const onSaved = useCallback(
     (onReset: () => void) => {
       setVisibleModal(false);
-      setVisibleModal(false);
       providerStore.onList(ProviderURL.list);
       onReset();
     },

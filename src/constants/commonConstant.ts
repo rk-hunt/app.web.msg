@@ -159,14 +159,17 @@ const providerLink = {
 
 const fieldTypes = [
   {
+    name: "provider_id",
     field: "providers",
     type: "objectId",
   },
   {
+    name: "server_id",
     field: "servers",
     type: "string",
   },
   {
+    name: "channel_id",
     field: "channels",
     type: "string",
   },

@@ -62,9 +62,20 @@ const AlertPage: React.FC = () => {
     [alertStore]
   );
 
+  const onSaved = useCallback(
+    (onReset: () => void) => {
+      setVisibleModal(false);
+      alertStore.onList(AlertURL.list);
+      onReset();
+    },
+    [alertStore]
+  );
+
   const onSave = useCallback(
-    (info: any, filterForms: AlertFilterForm[], onReset: () => void) => {},
-    []
+    (info: any, filterForms: AlertFilterForm[], onReset: () => void) => {
+      alertStore.onSaveAlert(info, filterForms, onSaved.bind(null, onReset));
+    },
+    [alertStore, onSaved]
   );
 
   const tableColumns = useMemo(() => {
