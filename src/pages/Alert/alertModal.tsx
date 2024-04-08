@@ -110,7 +110,7 @@ const FilterValue: React.FC<{
     return (
       <Form.Item
         label={index === 0 ? "Value" : null}
-        name="value"
+        name={filterForm.key}
         initialValue={filterForm.value}
       >
         <Select
@@ -136,7 +136,7 @@ const FilterValue: React.FC<{
     return (
       <Form.Item
         label={index === 0 ? "Value" : null}
-        name="value"
+        name={filterForm.key}
         initialValue={filterForm.value}
       >
         <Select
@@ -162,7 +162,7 @@ const FilterValue: React.FC<{
     return (
       <Form.Item
         label={index === 0 ? "Value" : null}
-        name={randomNumber()}
+        name={filterForm.key}
         initialValue={filterForm.value?.value}
       >
         <Input
@@ -204,7 +204,7 @@ const FilterValue: React.FC<{
     return (
       <Form.Item
         label={index === 0 ? "Value" : null}
-        name={randomNumber()}
+        name={filterForm.key}
         initialValue={filterForm.value}
       >
         <Input
@@ -501,4 +501,4 @@ const AlertModel: React.FC<AlertModalProps> = ({
   );
 };
 
-export default memo(observer(AlertModel));
+export default memo(AlertModel);

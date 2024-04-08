@@ -38,7 +38,7 @@ export default class AlertStore extends BaseStore<Alert> {
       rules.push({
         type: info.type,
         operator: info.operator as AlertOperator,
-        times: info.times,
+        times: parseFloat(info.times),
       });
     }
     const filterReq: AlertReq = {
@@ -51,6 +51,10 @@ export default class AlertStore extends BaseStore<Alert> {
     // filter
     const reqFilters: AlertFilter[] = [];
     for (const filter of filters) {
+      if (!filter.value || !filter.operator) {
+        continue;
+      }
+
       const fieldType = alertFieldType(filter.field as string);
       let reqFilter: AlertFilter = {
         field: fieldType?.name as string,
@@ -66,16 +70,16 @@ export default class AlertStore extends BaseStore<Alert> {
         } else {
           reqFilter.value = filter.value.map((val: any) => val.value);
         }
-        reqFilters.push(reqFilter);
       } else if (filter.field === "received_at") {
         reqFilter.value = {
           start: Date.now(),
-          value: filter?.value?.value || 1,
+          value: filter?.value?.value ? parseInt(filter.value?.value) : 1,
           unit: filter?.value?.unit || AlertFilterDateTimeUnit.minutes,
         };
       } else {
         reqFilter.value = filter.value;
       }
+      reqFilters.push(reqFilter);
     }
 
     filterReq.filters = reqFilters;

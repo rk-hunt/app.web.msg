@@ -7,12 +7,14 @@ import {
   Form,
   Input,
   Layout,
+  Modal,
   Row,
   Select,
+  Space,
   Table,
   TableColumnsType,
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import {
@@ -21,7 +23,7 @@ import {
   AlertURL,
   datetimeFormat,
 } from "../../constants";
-import { AlertFilterBy, AlertFilterForm } from "../../types";
+import { Alert, AlertFilterBy, AlertFilterForm } from "../../types";
 import Filter from "../Partial/Filter";
 import AlertModal from "./alertModal";
 
@@ -78,6 +80,36 @@ const AlertPage: React.FC = () => {
     [alertStore, onSaved]
   );
 
+  const onDelete = useCallback(
+    (id: string) => {
+      return new Promise(async (resolve, rejects) => {
+        const response = await alertStore.onDelete(AlertURL.base, id);
+        if (response) {
+          resolve("success");
+          return;
+        }
+        rejects("error");
+      }).catch(() => {
+        return "error";
+      });
+    },
+    [alertStore]
+  );
+
+  const onConfirmDeleting = useCallback(
+    (alert: Alert) => {
+      Modal.confirm({
+        title: "Delete Alert",
+        content: `Do you want to delete alert ${alert.name}?`,
+        onOk: () => onDelete(alert._id as string),
+        centered: true,
+        okText: "Yes",
+        cancelText: "No",
+      });
+    },
+    [onDelete]
+  );
+
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
       {
@@ -102,10 +134,27 @@ const AlertPage: React.FC = () => {
           return value === 0 ? "-" : dayjs(value).format(datetimeFormat);
         },
       },
+      {
+        title: "",
+        dataIndex: "",
+        render: (_: any, record: Alert) => {
+          return (
+            <Space>
+              <Button icon={<EditOutlined />} size="small" />
+
+              <Button
+                icon={<DeleteOutlined />}
+                size="small"
+                onClick={onConfirmDeleting.bind(null, record)}
+              />
+            </Space>
+          );
+        },
+      },
     ];
 
     return columns;
-  }, []);
+  }, [onConfirmDeleting]);
 
   useEffect(() => {
     alertStore.onList(AlertURL.list);

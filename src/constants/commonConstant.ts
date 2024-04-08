@@ -174,14 +174,17 @@ const fieldTypes = [
     type: "string",
   },
   {
+    name: "author_username",
     field: "authors",
     type: "string",
   },
   {
+    name: "received_at",
     field: "received_at",
     type: "datetime",
   },
   {
+    name: "content",
     field: "content",
     type: "search",
   },
