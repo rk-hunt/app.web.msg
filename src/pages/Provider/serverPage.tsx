@@ -267,7 +267,7 @@ const ServerPage: React.FC = () => {
                 </Col>
                 <Col span={8}>
                   <Form.Item label="Server Id" name="server_id">
-                    <Input placeholder="00001" allowClear />
+                    <Input placeholder="Server Id" allowClear />
                   </Form.Item>
                 </Col>
                 <Col span={8}>

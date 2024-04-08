@@ -35,15 +35,15 @@ export default class MessageStore extends BaseStore<Message> {
     });
   }
 
-  setFilterBy(val: any) {
+  setFilterBy(val: MessageFilterBy) {
     this.filterBy = val;
   }
 
-  setSortBy(val: any) {
+  setSortBy(val: MessageSortBy) {
     this.sortBy = val;
   }
 
-  setHighlightWeight(val: any) {
+  setHighlightWeight(val: number) {
     this.highlightWeight = val;
   }
 
@@ -104,6 +104,7 @@ export default class MessageStore extends BaseStore<Message> {
     if (this.intervalId !== 0) {
       clearInterval(this.intervalId);
     }
+    this.setFilterBy({});
     super.onReset();
   }
 }

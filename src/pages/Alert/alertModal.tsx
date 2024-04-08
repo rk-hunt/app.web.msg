@@ -1,6 +1,8 @@
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Col, Divider, Form, Input, Modal, Row, Select } from "antd";
-import React, { memo, useCallback, useMemo, useState } from "react";
+import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import {
+  ActionType,
   AlertFilterDateTimeUnit,
   AlertFrequencyType,
   AlertOperator,
@@ -14,14 +16,16 @@ import { observer } from "mobx-react-lite";
 import useStores from "../../stores";
 import { debounce } from "lodash";
 import { alertFieldType, alertOperators, randomNumber } from "../../utils";
-import { AlertFilterForm } from "../../types";
-import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
+import { AlertFilterForm, AlertInfo } from "../../types";
 import message from "../../utils/message";
 
 type AlertModalProps = {
   title: string;
   visible: boolean;
   isSaving: boolean;
+  actionType?: ActionType;
+  info?: AlertInfo;
+  filters?: AlertFilterForm[];
   onCancel: () => void;
   onSave: (
     values: any,
@@ -83,12 +87,11 @@ const FilterValue: React.FC<{
     return (
       <Form.Item
         label={index === 0 ? "Value" : null}
-        name="value"
+        name={filterForm.key}
         initialValue={filterForm.value}
       >
         <Select
           showSearch
-          allowClear
           filterOption={false}
           loading={isFetchingProvider}
           onSearch={onSearchProvider}
@@ -222,6 +225,9 @@ const AlertModel: React.FC<AlertModalProps> = ({
   title,
   visible,
   isSaving,
+  actionType,
+  info,
+  filters,
   onCancel,
   onSave,
 }) => {
@@ -238,6 +244,7 @@ const AlertModel: React.FC<AlertModalProps> = ({
     });
     setFilterForms(newFilterForms);
   }, [filterForms]);
+
   const onRemove = useCallback(
     (key: number) => {
       if (filterForms.length > 1) {
@@ -249,6 +256,7 @@ const AlertModel: React.FC<AlertModalProps> = ({
     },
     [filterForms]
   );
+
   const onUpdate = useCallback(
     (key: number, type: string, e: any) => {
       const updatedFilterForms = filterForms.map((filterForm) => {
@@ -266,6 +274,7 @@ const AlertModel: React.FC<AlertModalProps> = ({
               ...filterForm,
               key: randomNumber(),
               operator: e,
+              value: undefined,
             };
           } else if (type === "value") {
             if (filterForm.field === "received_at") {
@@ -291,7 +300,6 @@ const AlertModel: React.FC<AlertModalProps> = ({
         return filterForm;
       });
 
-      console.log("updatedFilterForms: ", updatedFilterForms);
       setFilterForms(updatedFilterForms);
     },
     [filterForms]
@@ -383,6 +391,13 @@ const AlertModel: React.FC<AlertModalProps> = ({
       })
       .catch((err) => {});
   }, [filterForms, form, onSave, onReset]);
+
+  useEffect(() => {
+    if (actionType === ActionType.Update) {
+      form.setFieldsValue(info);
+      setFilterForms(filters as AlertFilterForm[]);
+    }
+  }, [actionType, info, filters, form]);
 
   return (
     <Modal

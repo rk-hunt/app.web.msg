@@ -14,7 +14,11 @@ export default class BlacklistStore extends BaseStore<Blacklist> {
     });
   }
 
-  setFilterBy(val: any) {
+  setFilterBy(val: BlacklistFilterBy) {
     this.filterBy = val;
+  }
+  onReset(): void {
+    super.onReset();
+    this.setFilterBy({});
   }
 }

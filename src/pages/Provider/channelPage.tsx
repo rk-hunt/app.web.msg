@@ -268,7 +268,7 @@ const ChannelPage: React.FC = () => {
                 </Col>
                 <Col span={8}>
                   <Form.Item label="Channel Id" name="channel_id">
-                    <Input placeholder="1203356362361274400" allowClear />
+                    <Input placeholder="Channel Id" allowClear />
                   </Form.Item>
                 </Col>
                 <Col span={8}>

@@ -55,4 +55,9 @@ export default class ServerStore extends BaseStore<Server> {
   setFilterBy(val: ServerFilterBy) {
     this.filterBy = val;
   }
+
+  onReset(): void {
+    super.onReset();
+    this.setFilterBy({});
+  }
 }

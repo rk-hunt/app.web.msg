@@ -44,7 +44,7 @@ const MessageURL = {
 const AlertURL = {
   base: `${API_URL}/alert`,
   list: `${API_URL}/alerts`,
-  history: `${API_URL}/alert/histories`,
+  history: `${API_URL}/alerts/histories`,
 };
 
 export {

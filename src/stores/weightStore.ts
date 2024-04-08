@@ -14,7 +14,12 @@ export default class WeightStore extends BaseStore<Weight> {
     });
   }
 
-  setFilterBy(val: any) {
+  setFilterBy(val: WeightFilterBy) {
     this.filterBy = val;
+  }
+
+  onReset(): void {
+    super.onReset();
+    this.setFilterBy({});
   }
 }

@@ -39,7 +39,7 @@ type AlertFilter = {
   field: string;
   type: AlertType;
   operator: AlertOperator;
-  value: any;
+  value: any | any[];
 };
 
 type AlertRule = {
@@ -50,7 +50,6 @@ type AlertRule = {
 
 type AlertFilterForm = {
   key: number;
-  name?: string;
   field?: string;
   type?: AlertType;
   operator?: AlertOperator;

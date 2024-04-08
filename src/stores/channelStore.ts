@@ -26,7 +26,7 @@ export default class ChannelStore extends BaseStore<Channel> {
     });
   }
 
-  setFilterBy(val: any) {
+  setFilterBy(val: ChannelFilterBy) {
     this.filterBy = val;
   }
 
@@ -49,5 +49,10 @@ export default class ChannelStore extends BaseStore<Channel> {
 
   setChannelInfo(val: ChannelInfo) {
     this.channelInfo = val;
+  }
+
+  onReset(): void {
+    super.onReset();
+    this.setFilterBy({});
   }
 }

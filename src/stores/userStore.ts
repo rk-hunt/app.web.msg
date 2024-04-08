@@ -18,7 +18,7 @@ export default class UserStore extends BaseStore<Server> {
     });
   }
 
-  setFilterBy(val: any) {
+  setFilterBy(val: UserFilterBy) {
     this.filterBy = val;
   }
 
@@ -36,5 +36,10 @@ export default class UserStore extends BaseStore<Server> {
     }
     this.authStore.onCheckAuth(status, data.message);
     return false;
+  }
+
+  onReset(): void {
+    super.onReset();
+    this.setFilterBy({});
   }
 }

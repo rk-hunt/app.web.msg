@@ -31,7 +31,8 @@ const { Content } = Layout;
 
 const AlertPage: React.FC = () => {
   const { alertStore } = useStores();
-  const { data, isFetching, pageContext, isSaving } = alertStore;
+  const { data, isFetching, pageContext, isSaving, alertInfo, filters } =
+    alertStore;
 
   const [visibleModal, setVisibleModal] = useState(false);
   const [actionType, setActionType] = useState(ActionType.Create);
@@ -75,9 +76,14 @@ const AlertPage: React.FC = () => {
 
   const onSave = useCallback(
     (info: any, filterForms: AlertFilterForm[], onReset: () => void) => {
-      alertStore.onSaveAlert(info, filterForms, onSaved.bind(null, onReset));
+      alertStore.onSaveAlert(
+        info,
+        filterForms,
+        actionType,
+        onSaved.bind(null, onReset)
+      );
     },
-    [alertStore, onSaved]
+    [alertStore, onSaved, actionType]
   );
 
   const onDelete = useCallback(
@@ -110,6 +116,13 @@ const AlertPage: React.FC = () => {
     [onDelete]
   );
 
+  const onEdit = useCallback(
+    (info: Alert) => {
+      alertStore.onEdit(info._id, onOpenModal.bind(null, ActionType.Update));
+    },
+    [alertStore, onOpenModal]
+  );
+
   const tableColumns = useMemo(() => {
     const columns: TableColumnsType<any> = [
       {
@@ -140,8 +153,11 @@ const AlertPage: React.FC = () => {
         render: (_: any, record: Alert) => {
           return (
             <Space>
-              <Button icon={<EditOutlined />} size="small" />
-
+              <Button
+                icon={<EditOutlined />}
+                size="small"
+                onClick={onEdit.bind(null, record)}
+              />
               <Button
                 icon={<DeleteOutlined />}
                 size="small"
@@ -154,7 +170,7 @@ const AlertPage: React.FC = () => {
     ];
 
     return columns;
-  }, [onConfirmDeleting]);
+  }, [onConfirmDeleting, onEdit]);
 
   useEffect(() => {
     alertStore.onList(AlertURL.list);
@@ -234,9 +250,16 @@ const AlertPage: React.FC = () => {
         </Row>
       </Page>
       <AlertModal
-        title={actionType === ActionType.Create ? "New Alert" : `Edit Alert`}
+        title={
+          actionType === ActionType.Create
+            ? "New Alert"
+            : `Edit Alert (${alertInfo.name})`
+        }
         visible={visibleModal}
         isSaving={isSaving}
+        actionType={actionType}
+        info={alertInfo}
+        filters={filters}
         onCancel={onOpenModal.bind(null, ActionType.Create)}
         onSave={onSave}
       />
