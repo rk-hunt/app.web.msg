@@ -1,4 +1,6 @@
-const API_URL = `${process.env.REACT_APP_API_URL}`;
+import ENV from "./envConstant";
+
+const API_URL = ENV.APP_API_URL;
 
 const AuthURL = {
   login: `${API_URL}/auth/login`,

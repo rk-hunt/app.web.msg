@@ -1,0 +1,31 @@
+Version 1.0.0
+- Login
+- Verify OTP
+- Get Me
+- Register user
+- List users
+- Logout
+- Create provider
+- List provider
+- Add provider server
+- List provider servers
+- Delete provider serve
+- Add server channel
+- List server channels
+- Delete server channel
+- Create weight
+- List weights
+- Delete weight
+- Create blacklist
+- List blacklists
+- Delete blacklist
+
+Version 1.1.0
+- Create multi providers
+- Update provider
+- Update provider server
+- Update server channel
+- Improved list messages
+- Alert management
+- Import & export configuration: providers, provider server, server channels, weights and blacklists
+- Update Filter UI
