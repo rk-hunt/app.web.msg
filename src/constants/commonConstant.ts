@@ -39,6 +39,12 @@ const menus = [
     key: "messages",
   },
   {
+    name: "Alert Channels",
+    icon: "alert-channels",
+    url: "/alert-channels",
+    key: "alert-channels",
+  },
+  {
     name: "Alerts",
     icon: "alerts",
     url: "/alerts",

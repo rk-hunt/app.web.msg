@@ -49,6 +49,11 @@ const AlertURL = {
   history: `${API_URL}/alerts/histories`,
 };
 
+const AlertChannelURL = {
+  base: `${API_URL}/alert-channel`,
+  list: `${API_URL}/alert-channels`,
+};
+
 export {
   AuthURL,
   ProviderURL,
@@ -59,4 +64,5 @@ export {
   UserURL,
   MessageURL,
   AlertURL,
+  AlertChannelURL,
 };

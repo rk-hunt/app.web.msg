@@ -10,6 +10,7 @@ import UserStore from "./userStore";
 import MessageStore from "./messageStore";
 import AlertStore from "./alertStore";
 import AlertHistoryStore from "./alertHistoryStore";
+import AlertChannelStore from "./alertChannelStore";
 
 const authStore = new AuthStore();
 const baseStore = new BaseStore(authStore);
@@ -22,6 +23,7 @@ const userStore = new UserStore(authStore);
 const messageStore = new MessageStore(authStore);
 const alertStore = new AlertStore(authStore);
 const alertHistoryStore = new AlertHistoryStore(authStore);
+const alertChannelStore = new AlertChannelStore(authStore);
 
 const storesContext = React.createContext({
   authStore,
@@ -35,6 +37,7 @@ const storesContext = React.createContext({
   messageStore,
   alertStore,
   alertHistoryStore,
+  alertChannelStore,
 });
 
 const useStores = () => React.useContext(storesContext);

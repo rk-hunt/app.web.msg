@@ -18,6 +18,7 @@ import {
   GroupOutlined,
   HistoryOutlined,
   MessageOutlined,
+  NotificationOutlined,
   PercentageOutlined,
   PoweroffOutlined,
   TeamOutlined,
@@ -39,6 +40,7 @@ const ExportPage = lazy(() => import("./pages/export/exportPage"));
 const ImportPage = lazy(() => import("./pages/import/importPage"));
 const AlertPage = lazy(() => import("./pages/Alert/alertPage"));
 const AlertHistoryPage = lazy(() => import("./pages/Alert/alertHistoryPage"));
+const AlertChannelPage = lazy(() => import("./pages/Alert/alertChannelPage"));
 
 const { Sider } = Layout;
 const onGetIcons = (name: string): React.ReactNode => {
@@ -65,6 +67,8 @@ const onGetIcons = (name: string): React.ReactNode => {
       return <BellOutlined />;
     case "alert-histories":
       return <HistoryOutlined />;
+    case "alert-channels":
+      return <NotificationOutlined />;
   }
 };
 
@@ -202,6 +206,14 @@ const App: React.FC = () => {
             element={
               <AuthRoute>
                 <AlertHistoryPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/alert-channels"
+            element={
+              <AuthRoute>
+                <AlertChannelPage />
               </AuthRoute>
             }
           />

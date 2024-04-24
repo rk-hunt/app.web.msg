@@ -72,6 +72,25 @@ type AlertReq = {
   rules: AlertRule[];
 };
 
+type AlertChannel = {
+  _id: string;
+  name: string;
+  bot_token: string;
+  channel_id: string;
+  created_at: number;
+  updated_at: number;
+};
+
+type AlertChannelInfo = {
+  name: string;
+  bot_token: string;
+  channel_id: string;
+};
+
+type AlertChannelFilterBy = {
+  name?: string;
+};
+
 export type {
   Alert,
   AlertHistory,
@@ -82,4 +101,7 @@ export type {
   AlertRule,
   AlertInfo,
   AlertReq,
+  AlertChannel,
+  AlertChannelInfo,
+  AlertChannelFilterBy,
 };

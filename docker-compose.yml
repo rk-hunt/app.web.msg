@@ -2,9 +2,10 @@ version: "3.8"
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
+    image: registry.gitlab.com/web3205208/tokeninfo/app.web.token.info:master
+    # build:
+    #   context: .
+    #   dockerfile: ./docker/Dockerfile
     container_name: token.info.web.local
     env_file:
       - .env
