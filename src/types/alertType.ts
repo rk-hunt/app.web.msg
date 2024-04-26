@@ -4,6 +4,7 @@ import {
   AlertRuleType,
   AlertType,
 } from "../constants";
+import { SelectLabelInValue } from "./commonType";
 
 type Alert = {
   _id: string;
@@ -11,6 +12,9 @@ type Alert = {
   frequency_type: AlertFrequencyType;
   filters: AlertFilter[];
   rules: AlertRule[];
+  alert_channel_ids: any[];
+  alert_channels?: AlertChannel[];
+  alert_msg_template: string;
   last_alert_at: number;
   created_at: number;
   updated_at: number;
@@ -59,6 +63,8 @@ type AlertFilterForm = {
 type AlertInfo = {
   _id?: string;
   name: string;
+  alert_channels: SelectLabelInValue[];
+  alert_msg_template: string;
   frequency_type: AlertFrequencyType;
   type: AlertRuleType;
   operator: string;
@@ -68,6 +74,8 @@ type AlertInfo = {
 type AlertReq = {
   name: string;
   frequency_type: AlertFrequencyType;
+  alert_channel_ids: any[];
+  alert_msg_template: string;
   filters: AlertFilter[];
   rules: AlertRule[];
 };

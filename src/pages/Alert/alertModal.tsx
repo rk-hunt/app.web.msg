@@ -1,8 +1,19 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Col, Divider, Form, Input, Modal, Row, Select } from "antd";
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Mentions,
+  Modal,
+  Row,
+  Select,
+} from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   ActionType,
+  AlertChannelURL,
   AlertFilterDateTimeUnit,
   AlertFrequencyType,
   AlertOperator,
@@ -231,6 +242,10 @@ const AlertModel: React.FC<AlertModalProps> = ({
   onCancel,
   onSave,
 }) => {
+  const { alertChannelStore } = useStores();
+  const { data: alertChannels, isFetching: isFetchingAlertChannel } =
+    alertChannelStore;
+
   const [form] = Form.useForm<any>();
   const [formFilter] = Form.useForm<any>();
   const [filterForms, setFilterForms] = useState<AlertFilterForm[]>([
@@ -365,6 +380,17 @@ const AlertModel: React.FC<AlertModalProps> = ({
     });
   }, [filterForms, formFilter, onRemove, onUpdate]);
 
+  const onSearchAlertChannel = useCallback(
+    (value: string) => {
+      alertChannelStore.onList(AlertChannelURL.list, { name: value });
+    },
+    [alertChannelStore]
+  );
+
+  const onSearch = useMemo(() => {
+    return debounce(onSearchAlertChannel, 800);
+  }, [onSearchAlertChannel]);
+
   const onReset = useCallback(() => {
     form.resetFields();
     setFilterForms([{ ...defaultFilterFormValue }]);
@@ -419,7 +445,7 @@ const AlertModel: React.FC<AlertModalProps> = ({
         style={{ paddingTop: 24 }}
       >
         <Row gutter={32}>
-          <Col span={12}>
+          <Col span={8}>
             <Form.Item
               label="Name"
               name="name"
@@ -428,7 +454,7 @@ const AlertModel: React.FC<AlertModalProps> = ({
               <Input placeholder="Alert" />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col span={8}>
             <Form.Item
               label="Frequency"
               name="frequency_type"
@@ -448,6 +474,62 @@ const AlertModel: React.FC<AlertModalProps> = ({
                   {
                     value: AlertFrequencyType.OncePerDay,
                     label: AlertFrequencyType.OncePerDay,
+                  },
+                ]}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item
+              label="Alert Channels"
+              name="alert_channels"
+              rules={[{ required: true, message: "" }]}
+            >
+              <Select
+                showSearch
+                filterOption={false}
+                loading={isFetchingAlertChannel}
+                mode="multiple"
+                onSearch={onSearch}
+                placeholder="Type to search"
+                labelInValue
+                options={alertChannels.map((alertChannel) => ({
+                  value: alertChannel._id,
+                  label: alertChannel.name,
+                }))}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item
+              label="Template"
+              name="alert_msg_template"
+              rules={[{ required: true, message: "" }]}
+            >
+              <Mentions
+                rows={2}
+                placeholder="Use # for field"
+                prefix={["#"]}
+                options={[
+                  {
+                    value: "provider",
+                    label: "provider",
+                  },
+                  {
+                    value: "channel",
+                    label: "channel",
+                  },
+                  {
+                    value: "server",
+                    label: "server",
+                  },
+                  {
+                    value: "author",
+                    label: "author",
+                  },
+                  {
+                    value: "smart contract",
+                    label: "smart contract",
                   },
                 ]}
               />
@@ -516,4 +598,4 @@ const AlertModel: React.FC<AlertModalProps> = ({
   );
 };
 
-export default memo(AlertModel);
+export default memo(observer(AlertModel));

@@ -66,9 +66,12 @@ export default class AlertStore extends BaseStore<Alert> {
         times: parseFloat(info.times),
       });
     }
+    const alertChannelIds = info.alert_channels.map((val: any) => val.value);
     const filterReq: AlertReq = {
       name: info.name,
       frequency_type: info.frequency_type,
+      alert_channel_ids: alertChannelIds,
+      alert_msg_template: info.alert_msg_template,
       rules,
       filters: [],
     };
@@ -130,9 +133,20 @@ export default class AlertStore extends BaseStore<Alert> {
           ? data.payload.rules[0]
           : ({} as AlertRule);
 
+      const alertChannels = (data.payload.alert_channels as any[]).map(
+        (val) => {
+          return {
+            value: val._id,
+            label: val.name,
+          };
+        }
+      );
+
       const alertInfo: AlertInfo = {
         _id: data.payload._id,
         name: data.payload.name,
+        alert_channels: alertChannels,
+        alert_msg_template: data.payload.alert_msg_template,
         frequency_type: data.payload.frequency_type,
         type: rule.type,
         operator: rule.operator,
@@ -192,6 +206,8 @@ export default class AlertStore extends BaseStore<Alert> {
           field: fieldType?.field,
         });
       }
+
+      console.log("alertInfo: ", alertInfo);
 
       this.setAlertInfo(alertInfo);
       this.setFilters(filters);
