@@ -14,7 +14,7 @@ import {
   Table,
   TableColumnsType,
 } from "antd";
-import { ReloadOutlined } from "@ant-design/icons";
+import { HighlightOutlined, ReloadOutlined } from "@ant-design/icons";
 import useStores from "../../stores";
 import { Header, Page } from "../../components";
 import {
@@ -25,11 +25,12 @@ import {
   ServerURL,
   dateFormat,
   datetimeFormat,
+  highlightContentItems,
   localStorageKey,
   providerLink,
   refreshItems,
 } from "../../constants";
-import { Message, MessageFilterBy } from "../../types";
+import { Message, MessageFilterBy, MessageHighlightContent } from "../../types";
 import Markdown from "react-markdown";
 import { sortByBuilder } from "../../utils";
 import Filter from "../Partial/Filter";
@@ -53,6 +54,7 @@ const MessagePage: React.FC = () => {
     filterBy,
     sortBy,
     refreshInterval,
+    highlightContent,
   } = messageStore;
 
   const onApplyFilter = useCallback(
@@ -100,6 +102,29 @@ const MessagePage: React.FC = () => {
     const refreshInterval = localStorage.getItem(localStorageKey.msgInterval);
     if (refreshInterval) {
       messageStore.onChangeRefreshInterval(JSON.parse(refreshInterval).key);
+    }
+  }, [messageStore]);
+
+  const onSelectedHighlightContent = useCallback(
+    (menu: any) => {
+      const highlightContentItem = highlightContentItems.find(
+        (item) => item.key === parseInt(menu.key)
+      );
+      messageStore.setHighlightContent(
+        highlightContentItem as MessageHighlightContent
+      );
+    },
+    [messageStore]
+  );
+
+  const onCheckLocalHighlightContent = useCallback(() => {
+    const highlightContent = localStorage.getItem(
+      localStorageKey.msgHighlightContent
+    );
+    if (highlightContent) {
+      messageStore.setHighlightContent(
+        JSON.parse(highlightContent as string) as MessageHighlightContent
+      );
     }
   }, [messageStore]);
 
@@ -195,7 +220,9 @@ const MessagePage: React.FC = () => {
           if (message.weight >= highlightWeight) {
             return (
               <a href={url} target="_blank" rel="noreferrer">
-                <mark className="text-highlight">
+                <mark
+                  className={highlightContent.key === 1 ? "text-highlight" : ""}
+                >
                   <Markdown>{message.content}</Markdown>
                 </mark>
               </a>
@@ -213,32 +240,52 @@ const MessagePage: React.FC = () => {
     ];
 
     return columns;
-  }, [highlightWeight]);
+  }, [highlightWeight, highlightContent]);
 
   useEffect(() => {
+    onCheckLocalHighlightContent();
     messageStore.onListMessages(MessageURL.list);
     onCheckLocalInterval();
     return () => {
       messageStore.onReset();
     };
-  }, [messageStore, providerStore, onCheckLocalInterval]);
+  }, [
+    messageStore,
+    providerStore,
+    onCheckLocalInterval,
+    onCheckLocalHighlightContent,
+  ]);
 
   return (
     <Content>
       <Header
         title="Messages"
         extra={
-          <Dropdown
-            menu={{
-              items: refreshItems,
-              selectable: true,
-              onSelect: onSelectedRefreshInterval,
-            }}
-          >
-            <Button
-              icon={<ReloadOutlined />}
-            >{`Refresh Every ${refreshInterval.label}`}</Button>
-          </Dropdown>
+          <div>
+            <Dropdown
+              menu={{
+                items: highlightContentItems,
+                selectable: true,
+                onSelect: onSelectedHighlightContent,
+              }}
+            >
+              <Button
+                icon={<HighlightOutlined />}
+                style={{ marginRight: 8 }}
+              >{`Highlight Content ${highlightContent.label}`}</Button>
+            </Dropdown>
+            <Dropdown
+              menu={{
+                items: refreshItems,
+                selectable: true,
+                onSelect: onSelectedRefreshInterval,
+              }}
+            >
+              <Button
+                icon={<ReloadOutlined />}
+              >{`Refresh Every ${refreshInterval.label}`}</Button>
+            </Dropdown>
+          </div>
         }
       />
       <Page title="Messages">

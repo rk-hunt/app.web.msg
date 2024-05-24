@@ -1,5 +1,15 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Col, Divider, Form, Input, Modal, Row, Select } from "antd";
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Mentions,
+  Modal,
+  Row,
+  Select,
+} from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   ActionType,
@@ -490,7 +500,7 @@ const AlertModel: React.FC<AlertModalProps> = ({
               />
             </Form.Item>
           </Col>
-          {/* <Col span={24}>
+          <Col span={24}>
             <Form.Item
               label="Template"
               name="alert_msg_template"
@@ -517,14 +527,10 @@ const AlertModel: React.FC<AlertModalProps> = ({
                     value: "author",
                     label: "author",
                   },
-                  {
-                    value: "smart contract",
-                    label: "smart contract",
-                  },
                 ]}
               />
             </Form.Item>
-          </Col> */}
+          </Col>
         </Row>
         <Divider />
 

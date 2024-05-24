@@ -1,5 +1,5 @@
 import { TableColumnsType } from "antd";
-import { MessageRefreshInterval } from "../types";
+import { MessageHighlightContent, MessageRefreshInterval } from "../types";
 
 const menus = [
   {
@@ -90,8 +90,14 @@ const refreshItems: MessageRefreshInterval[] = [
   { key: 1800000, label: "30m" },
 ];
 
+const highlightContentItems: MessageHighlightContent[] = [
+  { key: 0, label: "Off" },
+  { key: 1, label: "On" },
+];
+
 const localStorageKey = {
   msgInterval: "msg_interval",
+  msgHighlightContent: "msg_highlight_content",
 };
 
 const exportField = {
@@ -228,6 +234,7 @@ export {
   datetimeFormat,
   dateFormat,
   refreshItems,
+  highlightContentItems,
   localStorageKey,
   exportField,
   importFileType,

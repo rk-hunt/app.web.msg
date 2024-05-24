@@ -29,8 +29,11 @@ const AlertHistoryPage: React.FC = () => {
         },
       },
       {
-        title: "message",
+        title: "Message",
         dataIndex: "message",
+        render: (message: string) => {
+          return <span style={{ whiteSpace: "pre-line" }}>{message}</span>;
+        },
       },
       {
         title: "Created At",

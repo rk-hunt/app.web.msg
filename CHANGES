@@ -1,4 +1,21 @@
+Version 1.1.1
+
+- Add alert template
+- Add On/Off message content highlight
+
+Version 1.1.0
+
+- Create multi providers
+- Update provider
+- Update provider server
+- Update server channel
+- Improved list messages
+- Alert management
+- Import & export configuration: providers, provider server, server channels, weights and blacklists
+- Update Filter UI
+
 Version 1.0.0
+
 - Login
 - Verify OTP
 - Get Me
@@ -19,13 +36,3 @@ Version 1.0.0
 - Create blacklist
 - List blacklists
 - Delete blacklist
-
-Version 1.1.0
-- Create multi providers
-- Update provider
-- Update provider server
-- Update server channel
-- Improved list messages
-- Alert management
-- Import & export configuration: providers, provider server, server channels, weights and blacklists
-- Update Filter UI

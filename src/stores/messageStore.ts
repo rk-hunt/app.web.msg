@@ -4,11 +4,17 @@ import BaseStore from "./baseStore";
 import {
   Message,
   MessageFilterBy,
+  MessageHighlightContent,
   MessageRefreshInterval,
   MessageSortBy,
 } from "../types";
 import AuthStore from "./authStore";
-import { MessageURL, localStorageKey, refreshItems } from "../constants";
+import {
+  MessageURL,
+  highlightContentItems,
+  localStorageKey,
+  refreshItems,
+} from "../constants";
 
 export default class MessageStore extends BaseStore<Message> {
   filterBy: MessageFilterBy = {};
@@ -16,6 +22,7 @@ export default class MessageStore extends BaseStore<Message> {
   highlightWeight: number = 0;
   refreshInterval: MessageRefreshInterval = refreshItems[0];
   intervalId: number = 0;
+  highlightContent: MessageHighlightContent = highlightContentItems[0];
 
   constructor(authStore: AuthStore) {
     super(authStore);
@@ -25,6 +32,7 @@ export default class MessageStore extends BaseStore<Message> {
       filterBy: observable,
       sortBy: observable,
       highlightWeight: observable,
+      highlightContent: observable,
       setFilterBy: action,
       setSortBy: action,
       setHighlightWeight: action,
@@ -54,6 +62,14 @@ export default class MessageStore extends BaseStore<Message> {
 
   setIntervalId(val: number) {
     this.intervalId = val;
+  }
+
+  setHighlightContent(val: MessageHighlightContent) {
+    this.highlightContent = val;
+    localStorage.setItem(
+      localStorageKey.msgHighlightContent,
+      JSON.stringify(val)
+    );
   }
 
   async onListMessages(url: string, filterBy?: any, sortBy?: any, page = 1) {

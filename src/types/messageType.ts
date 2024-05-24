@@ -44,4 +44,12 @@ type MessageRefreshInterval = {
   label: string;
 };
 
-export type { Message, MessageFilterBy, MessageRefreshInterval, MessageSortBy };
+type MessageHighlightContent = MessageRefreshInterval;
+
+export type {
+  Message,
+  MessageFilterBy,
+  MessageRefreshInterval,
+  MessageHighlightContent,
+  MessageSortBy,
+};
